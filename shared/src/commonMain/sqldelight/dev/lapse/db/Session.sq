@@ -1,0 +1,69 @@
+CREATE TABLE session (
+  id TEXT NOT NULL PRIMARY KEY,
+  startedAtMs INTEGER NOT NULL,
+  endedAtMs INTEGER,
+  activeDurationMs INTEGER NOT NULL,
+  isPaused INTEGER NOT NULL DEFAULT 0,
+  isCurrent INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE sessionTask (
+  id TEXT NOT NULL PRIMARY KEY,
+  sessionId TEXT NOT NULL,
+  title TEXT NOT NULL,
+  isCompleted INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX sessionTask_sessionId ON sessionTask(sessionId);
+
+CREATE TABLE sessionUsage (
+  sessionId TEXT NOT NULL,
+  applicationId TEXT NOT NULL,
+  displayName TEXT NOT NULL,
+  executableName TEXT NOT NULL,
+  activeDurationMs INTEGER NOT NULL,
+  PRIMARY KEY(sessionId, applicationId)
+);
+
+insertSession:
+INSERT OR REPLACE INTO session(id, startedAtMs, endedAtMs, activeDurationMs, isPaused, isCurrent)
+VALUES (?, ?, ?, ?, ?, ?);
+
+selectCurrent:
+SELECT *
+FROM session
+WHERE isCurrent = 1
+LIMIT 1;
+
+selectHistory:
+SELECT *
+FROM session
+WHERE isCurrent = 0
+ORDER BY startedAtMs ASC;
+
+deleteAllSessions:
+DELETE FROM session;
+
+insertTask:
+INSERT INTO sessionTask(id, sessionId, title, isCompleted)
+VALUES (?, ?, ?, ?);
+
+selectTasks:
+SELECT *
+FROM sessionTask
+WHERE sessionId = ?;
+
+deleteAllTasks:
+DELETE FROM sessionTask;
+
+insertUsage:
+INSERT INTO sessionUsage(sessionId, applicationId, displayName, executableName, activeDurationMs)
+VALUES (?, ?, ?, ?, ?);
+
+selectUsage:
+SELECT *
+FROM sessionUsage
+WHERE sessionId = ?;
+
+deleteAllUsage:
+DELETE FROM sessionUsage;

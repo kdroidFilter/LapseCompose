@@ -1,0 +1,15 @@
+*.iml
+.gradle
+.idea
+.kotlin
+.DS_Store
+build
+*/build
+captures
+.externalNativeBuild
+.cxx
+local.properties
+hs_err_pid*.log
+replay_pid*.log
+core.*
+_lapse_src/
