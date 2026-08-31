@@ -15,7 +15,7 @@ Requires JDK 25.
 ## Layout
 
 ```
-native/       Kotlin/Native Win32 (idle, lock, sleep, foreground app, boot id) via NNA
+native/       Kotlin/Native Win32 + macOS (idle, lock, sleep, foreground app, boot id) via NNA
 shared/       domain, persistence, Metro graph, ViewModel, Compose UI
 desktopApp/   Nucleus entry: overlay + dashboard + tray + autolaunch
 ```
