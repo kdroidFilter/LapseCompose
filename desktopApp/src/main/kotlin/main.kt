@@ -67,6 +67,8 @@ import lapse.shared.generated.resources.settings_autostart
 import lapse.shared.generated.resources.tray_collapse
 import lapse.shared.generated.resources.tray_dashboard
 import lapse.shared.generated.resources.tray_expand
+import lapse.shared.generated.resources.tray_close
+import lapse.shared.generated.resources.tray_close_dashboard
 import lapse.shared.generated.resources.tray_open
 import lapse.shared.generated.resources.tray_quit
 import lapse.shared.generated.resources.tray_settings
@@ -98,7 +100,9 @@ fun main(args: Array<String>) {
         }
         val trayTooltip = stringResource(Res.string.tray_tooltip)
         val trayOpen = stringResource(Res.string.tray_open)
+        val trayClose = stringResource(Res.string.tray_close)
         val trayDashboard = stringResource(Res.string.tray_dashboard)
+        val trayCloseDashboard = stringResource(Res.string.tray_close_dashboard)
         val traySettings = stringResource(Res.string.tray_settings)
         val trayExpand = stringResource(Res.string.tray_expand)
         val trayCollapse = stringResource(Res.string.tray_collapse)
@@ -110,8 +114,16 @@ fun main(args: Array<String>) {
             tooltip = trayTooltip,
             primaryAction = { vm.onIntent(AppIntent.ShowOverlay) },
         ) {
-            Item(label = trayOpen) { vm.onIntent(AppIntent.ShowOverlay) }
-            Item(label = trayDashboard) { vm.onIntent(AppIntent.OpenDashboard) }
+            Item(
+                label = if (state.overlayVisible) trayClose else trayOpen,
+            ) {
+                vm.onIntent(if (state.overlayVisible) AppIntent.HideOverlay else AppIntent.ShowOverlay)
+            }
+            Item(
+                label = if (state.dashboardOpen) trayCloseDashboard else trayDashboard,
+            ) {
+                vm.onIntent(if (state.dashboardOpen) AppIntent.CloseDashboard else AppIntent.OpenDashboard)
+            }
             Item(label = traySettings) { vm.onIntent(AppIntent.OpenDashboardSettings) }
             Item(
                 label = if (state.preferences.overlayMode == OverlayMode.Collapsed) trayExpand else trayCollapse,

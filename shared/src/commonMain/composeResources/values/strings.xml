@@ -3,7 +3,9 @@
     <string name="app_dashboard_title">Lapse Dashboard</string>
     <string name="tray_tooltip">Lapse — active time</string>
     <string name="tray_open">Open Lapse</string>
+    <string name="tray_close">Close Lapse</string>
     <string name="tray_dashboard">Open Dashboard</string>
+    <string name="tray_close_dashboard">Close Dashboard</string>
     <string name="tray_settings">Settings</string>
     <string name="tray_expand">Expand</string>
     <string name="tray_collapse">Collapse</string>
