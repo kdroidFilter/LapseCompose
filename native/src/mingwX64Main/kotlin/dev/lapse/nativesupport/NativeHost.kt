@@ -4,8 +4,10 @@ package dev.lapse.nativesupport
 
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.allocArray
+import kotlinx.cinterop.convert
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
+import kotlinx.cinterop.sizeOf
 import kotlinx.cinterop.toKString
 import kotlinx.cinterop.value
 import platform.windows.CloseDesktop
@@ -13,12 +15,15 @@ import platform.windows.CloseHandle
 import platform.windows.DWORDVar
 import platform.windows.FILETIME
 import platform.windows.GetForegroundWindow
+import platform.windows.GetLastInputInfo
 import platform.windows.GetSystemTimeAsFileTime
+import platform.windows.GetTickCount
 import platform.windows.GetTickCount64
 import platform.windows.GetUserObjectInformationW
 import platform.windows.GetWindowTextLengthW
 import platform.windows.GetWindowTextW
 import platform.windows.GetWindowThreadProcessId
+import platform.windows.LASTINPUTINFO
 import platform.windows.OpenInputDesktop
 import platform.windows.OpenProcess
 import platform.windows.PROCESS_QUERY_LIMITED_INFORMATION
@@ -33,11 +38,16 @@ actual class NativeHost actual constructor() {
     private var lastWallMs: Long = wallClockMs()
     private var sleeping: Boolean = false
 
+    init {
+        WindowsSession.ensureStarted()
+    }
+
     actual fun activitySnapshot(): ActivitySnapshot {
         refreshSleep()
         return ActivitySnapshot(
-            locked = isLocked(),
-            sleeping = sleeping,
+            idleMilliseconds = idleMilliseconds(),
+            locked = WindowsSession.locked ?: isLockedDesktop(),
+            sleeping = WindowsSession.sleeping ?: sleeping,
         )
     }
 
@@ -53,7 +63,7 @@ actual class NativeHost actual constructor() {
             pathSize.value = 32768u
             if (QueryFullProcessImageNameW(process, 0u, pathBuf, pathSize.ptr) == 0) return null
             val path = pathBuf.toKString()
-            val executableName = fileName(path)
+            val executableName = windowsFileName(path)
             val titleLength = GetWindowTextLengthW(hwnd)
             val title = if (titleLength > 0) {
                 val titleBuf = allocArray<WCHARVar>(titleLength + 1)
@@ -66,7 +76,7 @@ actual class NativeHost actual constructor() {
                 processId = pid.value.toInt(),
                 executablePath = path,
                 executableName = executableName,
-                displayName = executableName,
+                displayName = WindowsVersion.displayName(path),
                 windowTitle = title,
             )
         } finally {
@@ -74,7 +84,17 @@ actual class NativeHost actual constructor() {
         }
     }
 
-    private fun isLocked(): Boolean = memScoped {
+    private fun idleMilliseconds(): Long = memScoped {
+        val info = alloc<LASTINPUTINFO>()
+        info.cbSize = sizeOf<LASTINPUTINFO>().convert()
+        if (GetLastInputInfo(info.ptr) == 0) return 0L
+        val now = GetTickCount().toLong() and 0xFFFFFFFFL
+        val last = info.dwTime.toLong() and 0xFFFFFFFFL
+        val idle = now - last
+        if (idle < 0) idle + 0x1_0000_0000L else idle
+    }
+
+    private fun isLockedDesktop(): Boolean = memScoped {
         val desk = OpenInputDesktop(0u, 0, DESKTOP_READOBJECTS) ?: return true
         val name = allocArray<WCHARVar>(256)
         val needed = alloc<DWORDVar>()
@@ -106,10 +126,5 @@ actual class NativeHost actual constructor() {
         val high = fileTime.dwHighDateTime.toULong()
         val low = fileTime.dwLowDateTime.toULong()
         ((high shl 32) or low).toLong() / 10_000L
-    }
-
-    private fun fileName(path: String): String {
-        val slash = path.lastIndexOfAny(charArrayOf('\\', '/'))
-        return if (slash >= 0) path.substring(slash + 1) else path
     }
 }

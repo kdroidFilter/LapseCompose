@@ -1,0 +1,10 @@
+package = lapse.win32
+headers = windows.h winver.h wtsapi32.h
+headerFilter = winver.h wtsapi32.h
+compilerOpts = -DUNICODE -DWINVER=0x0601 -D_WIN32_WINNT=0x0601
+linkerOpts = -lversion -lwtsapi32
+---
+
+DWORD GetFileVersionInfoSizeW(LPCWSTR lptstrFilename, LPDWORD lpdwHandle);
+BOOL GetFileVersionInfoW(LPCWSTR lptstrFilename, DWORD dwHandle, DWORD dwLen, LPVOID lpData);
+BOOL VerQueryValueW(LPCVOID pBlock, LPCWSTR lpSubBlock, LPVOID *lplpBuffer, PUINT puLen);

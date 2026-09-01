@@ -8,7 +8,20 @@ class NativeHostTest {
     @Test
     fun activitySnapshotIsSane() {
         NativeHost().use { host ->
-            host.activitySnapshot()
+            val snap = host.activitySnapshot()
+            assertTrue(snap.idleMilliseconds >= -1L)
+        }
+    }
+
+    @Test
+    fun windowsIdleIsMillisecondsWhenAvailable() {
+        NativeHost().use { host ->
+            val idle = host.activitySnapshot().idleMilliseconds
+            val windows = System.getProperty("os.name").orEmpty().contains("win", ignoreCase = true)
+            if (windows) {
+                assertTrue(idle >= 0L)
+                assertTrue(idle < 7L * 24 * 60 * 60 * 1000)
+            }
         }
     }
 

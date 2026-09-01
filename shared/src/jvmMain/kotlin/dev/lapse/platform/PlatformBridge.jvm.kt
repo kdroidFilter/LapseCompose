@@ -18,14 +18,18 @@ class NativePlatformBridge(
     }
 
     override fun activitySnapshot(): ActivitySnapshot {
-        val idleSec = SystemInfo.idleTime()
-        val idleMs = if (idleSec < 0L) 0L else idleSec * 1000L
         val snap = host?.activitySnapshot()
+        val idleMs = snap?.idleMilliseconds?.takeIf { it >= 0L } ?: systemIdleMs()
         return ActivitySnapshot(
             idleDurationMs = idleMs,
             locked = snap?.locked == true,
             sleeping = snap?.sleeping == true,
         )
+    }
+
+    private fun systemIdleMs(): Long {
+        val idleSec = SystemInfo.idleTime()
+        return if (idleSec < 0L) 0L else idleSec * 1000L
     }
 
     override fun bootId(): String {

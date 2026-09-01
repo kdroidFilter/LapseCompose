@@ -9,6 +9,7 @@ actual class NativeHost actual constructor() {
     actual fun activitySnapshot(): ActivitySnapshot {
         refreshSleep()
         return ActivitySnapshot(
+            idleMilliseconds = -1L,
             locked = LinuxDbus.isLocked() || lockProcessRunning(),
             sleeping = sleeping,
         )

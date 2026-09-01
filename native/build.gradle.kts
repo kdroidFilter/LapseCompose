@@ -12,7 +12,14 @@ kotlin {
             val arch = System.getProperty("os.arch").orEmpty()
             if (arch == "aarch64" || arch == "arm64") macosArm64() else macosX64()
         }
-        Os.isFamily(Os.FAMILY_WINDOWS) -> mingwX64()
+        Os.isFamily(Os.FAMILY_WINDOWS) -> {
+            val mingw = mingwX64()
+            mingw.compilations.getByName("main").cinterops {
+                val win32 by creating {
+                    defFile(project.file("src/nativeInterop/cinterop/win32.def"))
+                }
+            }
+        }
         else -> {
             val arch = System.getProperty("os.arch").orEmpty()
             val linux = if (arch == "aarch64" || arch == "arm64") linuxArm64() else linuxX64()

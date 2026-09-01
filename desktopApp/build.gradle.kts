@@ -43,7 +43,7 @@ val releaseVersion =
     System.getenv("RELEASE_VERSION")
         ?.removePrefix("v")
         ?.takeIf { it.isNotBlank() && it.first().isDigit() }
-        ?: "0.1.0"
+        ?: "0.1.1"
 
 val nativePackageVersion = releaseVersion.substringBefore("-")
 

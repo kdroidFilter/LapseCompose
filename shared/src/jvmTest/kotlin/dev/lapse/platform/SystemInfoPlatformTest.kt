@@ -19,4 +19,11 @@ class SystemInfoPlatformTest {
         val idle = SystemInfo.idleTime()
         assertTrue(idle >= -1L)
     }
+
+    @Test
+    fun activitySnapshotIdleIsMilliseconds() {
+        val snap = NativePlatformBridge().activitySnapshot()
+        assertTrue(snap.idleDurationMs >= 0L)
+        assertTrue(snap.idleDurationMs < 7L * 24 * 60 * 60 * 1000)
+    }
 }
