@@ -115,7 +115,7 @@ fun main(args: Array<String>) {
             windowsIcon = icon,
             macLinuxIcon = trayIcon(badge = update.ready),
             tooltip = stringResource(Res.string.tray_tooltip),
-            primaryAction = { vm.onIntent(AppIntent.ShowOverlay) },
+            primaryAction = { vm.onIntent(if (overlayVisible) AppIntent.HideOverlay else AppIntent.ShowOverlay) },
         ) {
             if (update.ready) {
                 Item(label = stringResource(Res.string.tray_update_now)) { update.installAndRestart() }
