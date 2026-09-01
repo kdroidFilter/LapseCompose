@@ -1,6 +1,7 @@
 package dev.lapse.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import dev.lapse.domain.UserActivityState
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.TimeZone
@@ -84,6 +85,8 @@ fun activityStatusLabel(state: UserActivityState): String = stringResource(
     },
 )
 
+@Composable
+@ReadOnlyComposable
 fun statusColor(state: UserActivityState) = when (state) {
     UserActivityState.Active -> dev.lapse.theme.LapseColors.active
     UserActivityState.Paused -> dev.lapse.theme.LapseColors.accent

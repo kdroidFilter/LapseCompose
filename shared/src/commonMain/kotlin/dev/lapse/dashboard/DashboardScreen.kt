@@ -277,13 +277,14 @@ private fun OverviewPage(sessions: List<ComputerSession>, nowMs: Long) {
 
 @Composable
 private fun Metric(label: String, value: String, modifier: Modifier, showLeftBorder: Boolean) {
+    val borderColor = LapseColors.border
     Column(
         modifier
             .drawBehind {
                 if (!showLeftBorder) return@drawBehind
                 val stroke = 1.dp.toPx()
                 drawLine(
-                    color = LapseColors.border,
+                    color = borderColor,
                     start = Offset(stroke / 2f, 0f),
                     end = Offset(stroke / 2f, size.height),
                     strokeWidth = stroke,

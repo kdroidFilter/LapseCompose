@@ -172,7 +172,7 @@ private fun NucleusApplicationScope.OverlayWindow(vm: AppViewModel) {
         nativeContextMenu = true,
         minimumSize = DpSize(AppConstants.COLLAPSED_WIDTH.dp, AppConstants.COLLAPSED_HEIGHT.dp),
     ) {
-        WindowAppearance(WindowAppearanceMode.Dark)
+        WindowAppearance(WindowAppearanceMode.System)
         WindowBackground(LapseColors.background)
         WindowsBackdrop(style = WindowsBackdropStyle.Acrylic)
         WindowScaffold {
@@ -223,7 +223,7 @@ private fun NucleusApplicationScope.DashboardWindow(vm: AppViewModel) {
             window.toFront()
             window.requestFocus()
         }
-        WindowAppearance(WindowAppearanceMode.Dark)
+        WindowAppearance(WindowAppearanceMode.System)
         WindowBackground(LapseColors.background)
         WindowsBackdrop(style = WindowsBackdropStyle.Acrylic)
         WindowScaffold(

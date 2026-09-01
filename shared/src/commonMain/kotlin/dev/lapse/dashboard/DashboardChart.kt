@@ -91,11 +91,12 @@ internal fun UsageChart(
             },
     ) {
         val hovered = hoveredIndex
+        val colors = LapseColors
         Canvas(Modifier.fillMaxSize()) {
             val maxMinutes = max(60L, points.maxOf { it.durationMs / 60_000L })
             val chartHeight = (size.height - 30.dp.toPx()).coerceAtLeast(0f)
             val slot = size.width / points.size
-            val guide = LapseColors.border.copy(alpha = 0.65f)
+            val guide = colors.border.copy(alpha = 0.65f)
             for (guideIndex in 0..3) {
                 val y = chartHeight * guideIndex / 3f
                 drawLine(guide, Offset(0f, y), Offset(size.width, y), strokeWidth = 1.dp.toPx())
@@ -104,7 +105,7 @@ internal fun UsageChart(
                 val isHovered = hovered == index
                 if (isHovered) {
                     drawRoundRect(
-                        color = LapseColors.accent.copy(alpha = 0.055f),
+                        color = colors.accent.copy(alpha = 0.055f),
                         topLeft = Offset(index * slot + 3.dp.toPx(), 0f),
                         size = Size(slot - 6.dp.toPx(), chartHeight),
                         cornerRadius = CornerRadius(6.dp.toPx()),
@@ -113,10 +114,10 @@ internal fun UsageChart(
                 val measured = chartHeight * (point.durationMs / 60_000f) / maxMinutes
                 val barHeight = if (point.durationMs == 0L) 2.dp.toPx() else measured
                 val barColor = when {
-                    point.durationMs == 0L && isHovered -> LapseColors.accent.copy(alpha = 0.55f)
-                    point.durationMs == 0L -> LapseColors.border
-                    isHovered -> lerp(LapseColors.accent, Color.White, 0.18f)
-                    else -> LapseColors.accent
+                    point.durationMs == 0L && isHovered -> colors.accent.copy(alpha = 0.55f)
+                    point.durationMs == 0L -> colors.border
+                    isHovered -> lerp(colors.accent, colors.text, 0.18f)
+                    else -> colors.accent
                 }
                 drawRoundRect(
                     color = barColor,
@@ -127,7 +128,7 @@ internal fun UsageChart(
                 val layout = measurer.measure(
                     text = labels[index],
                     style = TextStyle(
-                        color = if (isHovered) LapseColors.text else LapseColors.textMuted,
+                        color = if (isHovered) colors.text else colors.textMuted,
                         fontSize = 10.sp,
                         fontWeight = if (isHovered) FontWeight.SemiBold else FontWeight.Normal,
                     ),
