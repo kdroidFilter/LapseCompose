@@ -105,7 +105,7 @@ class AppViewModel(
             bootId = platform.bootId()
             val persisted = store.load()
             val sameBoot = persisted?.bootId == bootId
-            val session = if (sameBoot && persisted != null) {
+            val session = if (sameBoot) {
                 persisted.session
             } else {
                 ComputerSession(

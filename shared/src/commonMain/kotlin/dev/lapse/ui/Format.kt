@@ -3,8 +3,10 @@ package dev.lapse.ui
 import androidx.compose.runtime.Composable
 import dev.lapse.domain.UserActivityState
 import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import lapse.shared.generated.resources.Res
 import lapse.shared.generated.resources.activity_active
@@ -94,7 +96,7 @@ fun sessionDateLabel(epochMs: Long, nowMs: Long): String {
     return when (date) {
         today -> stringResource(Res.string.today)
         today.minus(DatePeriod(days = 1)) -> stringResource(Res.string.yesterday)
-        else -> "${date.dayOfMonth.toString().padStart(2, '0')}.${date.monthNumber.toString().padStart(2, '0')}.${date.year}"
+        else -> "${date.day.toString().padStart(2, '0')}.${date.month.number.toString().padStart(2, '0')}.${date.year}"
     }
 }
 

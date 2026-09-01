@@ -36,6 +36,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Launch
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.CheckBox
@@ -44,7 +45,6 @@ import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.ExpandMore
-import androidx.compose.material.icons.rounded.Launch
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Remove
@@ -317,7 +317,7 @@ private fun ExpandedOverlay(state: AppState, onIntent: (AppIntent) -> Unit, drag
                 Text(stringResource(Res.string.overlay_add_task), fontSize = 11.sp)
             }
             Spacer(Modifier.weight(1f))
-            SmallIcon(Icons.Rounded.Launch, stringResource(Res.string.cd_open_dashboard)) { onIntent(AppIntent.OpenDashboard) }
+            SmallIcon(Icons.AutoMirrored.Rounded.Launch, stringResource(Res.string.cd_open_dashboard)) { onIntent(AppIntent.OpenDashboard) }
         }
     }
 }
