@@ -16,6 +16,22 @@ This is a Nucleus + Compose Multiplatform rewrite of [zTomz/Lapse](https://githu
 
 Requires JDK 25.
 
+## Install
+
+Prebuilt packages (DMG, NSIS) are on [GitHub Releases](https://github.com/kdroidFilter/LapseCompose/releases): macOS (Apple Silicon and Intel) and Windows (x64). Linux packaging is not published yet.
+
+## Packages
+
+GraalVM native installers for the current OS:
+
+```sh
+./gradlew :desktopApp:packageGraalvmDmg    # macOS
+./gradlew :desktopApp:packageGraalvmZip    # macOS updater payload
+./gradlew :desktopApp:packageGraalvmNsis   # Windows
+```
+
+Pushing a `v*` tag builds these packages for macOS (Intel, Apple Silicon) and Windows (x64), then publishes them as a GitHub Release.
+
 ## Layout
 
 ```
@@ -26,7 +42,7 @@ desktopApp/   Nucleus entry: overlay + dashboard + tray + autolaunch
 
 ## Stack
 
-- Nucleus 2.5.11
-- Nucleus Native Access 0.7.0
+- Nucleus 2.5.12
+- Nucleus Native Access 0.7.1
 - Kotlin 2.4.10 / Compose Multiplatform 1.12
 - Metro DI, AndroidX ViewModel, unidirectional `AppState` + `AppIntent`

@@ -1,0 +1,163 @@
+name: Release Desktop
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: GraalVM - ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS ARM64
+            os: macos-latest
+            arch: arm64
+          # macOS Intel falls back to GA 25.0.x: GraalVM 25.1 has no macos-x64 feature build.
+          - name: macOS Intel
+            os: macos-15-intel
+            arch: amd64
+          - name: Windows x64
+            os: windows-latest
+            arch: amd64
+
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RELEASE_VERSION: ${{ github.ref_name }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Normalize version for manual runs
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="$(git describe --tags --abbrev=0)"
+          echo "RELEASE_VERSION=$tag" >> "$GITHUB_ENV"
+
+      - name: Setup Nucleus (GraalVM)
+        uses: NucleusFramework/Nucleus/.github/actions/setup-nucleus@v2.5.12
+        with:
+          graalvm: 'true'
+          packaging-tools: 'true'
+          setup-gradle: 'true'
+          setup-node: 'true'
+
+      - name: Cache Kotlin/Native
+        uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: konan-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('gradle/libs.versions.toml') }}
+
+      - name: Build GraalVM native packages
+        shell: bash
+        # GraalVM CE is resolved through the GitHub releases API. Hosted runners share an IP,
+        # so the 60/hour anonymous limit is routinely exhausted — authenticate the call.
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            ./gradlew :desktopApp:packageGraalvmDmg :desktopApp:packageGraalvmZip -PnativeMarch=compatibility --no-daemon --stacktrace
+          elif [ "$RUNNER_OS" = "Windows" ]; then
+            ./gradlew :desktopApp:packageGraalvmNsis -PnativeMarch=compatibility --no-daemon --stacktrace
+          fi
+
+      - name: Upload GraalVM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-assets-${{ runner.os }}-${{ matrix.arch }}
+          path: |
+            desktopApp/build/compose/binaries/**/graalvm-nsis/*.exe
+            desktopApp/build/compose/binaries/**/graalvm-nsis/*.blockmap
+            desktopApp/build/compose/binaries/**/graalvm-dmg/*.dmg
+            desktopApp/build/compose/binaries/**/graalvm-dmg/*.blockmap
+            desktopApp/build/compose/binaries/**/graalvm-zip/*.zip
+            desktopApp/build/compose/binaries/**/graalvm-zip/*.blockmap
+          if-no-files-found: error
+
+  publish:
+    name: Publish Release
+    needs: [build]
+    if: ${{ !cancelled() && needs.build.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: release-assets-*
+
+      - name: Drop packaging leftovers
+        shell: bash
+        run: |
+          set -euo pipefail
+          find artifacts -type f ! \( \
+            -name '*.dmg' -o -name '*.exe' -o -name '*.zip' -o \
+            -name '*.blockmap' \
+          \) -print -delete
+
+      - name: Determine version and channel
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            TAG="$(git describe --tags --abbrev=0)"
+          fi
+          VERSION="${TAG#v}"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          if [[ "$VERSION" == *"-alpha"* ]]; then
+            echo "CHANNEL=alpha" >> "$GITHUB_ENV"
+          elif [[ "$VERSION" == *"-beta"* ]]; then
+            echo "CHANNEL=beta" >> "$GITHUB_ENV"
+          else
+            echo "CHANNEL=latest" >> "$GITHUB_ENV"
+          fi
+          if [[ "$VERSION" == *"-alpha"* ]] || [[ "$VERSION" == *"-beta"* ]]; then
+            echo "RELEASE_TYPE=prerelease" >> "$GITHUB_ENV"
+          else
+            echo "RELEASE_TYPE=release" >> "$GITHUB_ENV"
+          fi
+
+      - name: Generate update YML files
+        uses: NucleusFramework/Nucleus/.github/actions/generate-update-yml@v2.5.12
+        with:
+          artifacts-path: artifacts
+          version: ${{ env.VERSION }}
+          channel: ${{ env.CHANNEL }}
+
+      - name: Publish release
+        uses: NucleusFramework/Nucleus/.github/actions/publish-release@v2.5.12
+        with:
+          artifacts-path: artifacts
+          tag: ${{ env.TAG }}
+          release-type: ${{ env.RELEASE_TYPE }}

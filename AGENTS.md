@@ -17,3 +17,7 @@ All application code except the window host lives in `shared`. `desktopApp` only
 | Desktop | `./gradlew :desktopApp:run` |
 | Tests | `./gradlew :shared:jvmTest` |
 | Stability dump | `./gradlew :shared:stabilityDump` |
+| macOS packages | `./gradlew :desktopApp:packageGraalvmDmg :desktopApp:packageGraalvmZip` |
+| Windows package | `./gradlew :desktopApp:packageGraalvmNsis` |
+
+Release: push a `v*` tag. GitHub Actions (Nucleus `setup-nucleus` / `generate-update-yml` / `publish-release`) builds GraalVM installers for macOS (arm64 + x64) and Windows (x64) and publishes a GitHub Release. Linux is not in the matrix yet.
