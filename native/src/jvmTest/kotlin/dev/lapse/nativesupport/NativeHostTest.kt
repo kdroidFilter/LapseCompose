@@ -14,11 +14,12 @@ class NativeHostTest {
     }
 
     @Test
-    fun windowsIdleIsMillisecondsWhenAvailable() {
+    fun idleIsMillisecondsWhenAvailable() {
         NativeHost().use { host ->
             val idle = host.activitySnapshot().idleMilliseconds
-            val windows = System.getProperty("os.name").orEmpty().contains("win", ignoreCase = true)
-            if (windows) {
+            val os = System.getProperty("os.name").orEmpty()
+            val reportsIdle = os.contains("win", ignoreCase = true) || os.contains("mac", ignoreCase = true)
+            if (reportsIdle) {
                 assertTrue(idle >= 0L)
                 assertTrue(idle < 7L * 24 * 60 * 60 * 1000)
             }

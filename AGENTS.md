@@ -8,7 +8,7 @@
 └── desktopApp/        # thin Nucleus entry point
 ```
 
-All application code except the window host lives in `shared`. `desktopApp` only starts Nucleus windows and the tray. Boot id comes from `nucleus.system-info`. Idle time on Windows is `GetLastInputInfo` (milliseconds) in `native`; other platforms use `nucleus.system-info` (seconds). Lock, sleep, and the focused window live in `native` (`expect` in `nativeMain`, `actual` in `mingwX64Main` / `macosMain` / `linuxMain`) and are called from the JVM through Nucleus Native Access — never C++. Windows app names come from the PE `ProductName` / `FileDescription`. Autostart uses `nucleus.autolaunch`. The native Gradle target is host-conditional (`mingwX64` / `macosArm64` / `macosX64` / `linuxX64` / `linuxArm64`).
+All application code except the window host lives in `shared`. `desktopApp` only starts Nucleus windows and the tray. Boot id comes from `nucleus.system-info`. Idle time is millisecond-precise in `native` on Windows (`GetLastInputInfo`) and macOS (`CGEventSourceSecondsSinceLastEventType`); Linux uses `nucleus.system-info` (seconds). Lock, sleep, and the focused window live in `native` (`expect` in `nativeMain`, `actual` in `mingwX64Main` / `macosMain` / `linuxMain`) and are called from the JVM through Nucleus Native Access — never C++. Windows app names come from the PE `ProductName` / `FileDescription`. Autostart uses `nucleus.autolaunch`. The native Gradle target is host-conditional (`mingwX64` / `macosArm64` / `macosX64` / `linuxX64` / `linuxArm64`).
 
 ## Build
 

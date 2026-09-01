@@ -35,7 +35,7 @@ Pushing a `v*` tag builds these packages for macOS (Intel, Apple Silicon) and Wi
 ## Layout
 
 ```
-native/       Kotlin/Native (lock, sleep, foreground app) via NNA; idle + boot id from nucleus.system-info
+native/       Kotlin/Native (lock, sleep, foreground app, idle on Windows + macOS) via NNA; boot id from nucleus.system-info
 shared/       domain, persistence, Metro graph, ViewModel, Compose UI
 desktopApp/   Nucleus entry: overlay + dashboard + tray + autolaunch
 ```
@@ -52,4 +52,3 @@ desktopApp/   Nucleus entry: overlay + dashboard + tray + autolaunch
 The session model, overlay, dashboard, and Linux/mac/Windows native hosts match the original. Open vs [zTomz/Lapse](https://github.com/zTomz/Lapse):
 
 - No Compose UI tests. Flutter had widget tests for the overlay and dashboard.
-- macOS still infers sleep when wall time jumps more than 15s vs the tick counter. Linux uses `CLOCK_BOOTTIME`; Windows listens for `WM_POWERBROADCAST` and falls back to the same heuristic.

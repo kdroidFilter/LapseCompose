@@ -32,30 +32,34 @@ import platform.CoreFoundation.CFStringGetLength
 import platform.CoreFoundation.CFStringGetMaximumSizeForEncoding
 import platform.CoreFoundation.kCFNumberIntType
 import platform.CoreFoundation.kCFStringEncodingUTF8
+import platform.CoreGraphics.CGEventSourceSecondsSinceLastEventType
 import platform.CoreGraphics.CGSessionCopyCurrentDictionary
 import platform.CoreGraphics.CGWindowListCopyWindowInfo
+import platform.CoreGraphics.kCGEventSourceStateHIDSystemState
 import platform.CoreGraphics.kCGNullWindowID
 import platform.CoreGraphics.kCGWindowLayer
 import platform.CoreGraphics.kCGWindowListExcludeDesktopElements
 import platform.CoreGraphics.kCGWindowListOptionOnScreenOnly
 import platform.CoreGraphics.kCGWindowName
 import platform.CoreGraphics.kCGWindowOwnerPID
-import platform.posix.CLOCK_REALTIME
+import platform.posix.CLOCK_MONOTONIC
 import platform.posix.CLOCK_UPTIME_RAW
 import platform.posix.clock_gettime_nsec_np
 
 private const val LOCKED_KEY = "CGSSessionScreenIsLocked"
 private const val ON_CONSOLE_KEY = "kCGSSessionOnConsoleKey"
 
+/** `kCGAnyInputEventType`: a macro cast, so cinterop does not expose it. */
+private const val ANY_INPUT_EVENT_TYPE = 0xFFFFFFFFu
+
 actual class NativeHost actual constructor() {
-    private var lastTickMs: Long = uptimeMs()
-    private var lastWallMs: Long = wallClockMs()
+    private var lastSleepDebtMs: Long = sleepDebtMs()
     private var sleeping: Boolean = false
 
     actual fun activitySnapshot(): ActivitySnapshot {
         refreshSleep()
         return ActivitySnapshot(
-            idleMilliseconds = -1L,
+            idleMilliseconds = idleMilliseconds(),
             locked = isLocked(),
             sleeping = sleeping,
         )
@@ -88,12 +92,18 @@ actual class NativeHost actual constructor() {
         }
     }
 
+    private fun idleMilliseconds(): Long {
+        val seconds = CGEventSourceSecondsSinceLastEventType(
+            kCGEventSourceStateHIDSystemState,
+            ANY_INPUT_EVENT_TYPE,
+        )
+        return if (seconds < 0.0) -1L else (seconds * 1000.0).toLong()
+    }
+
     private fun refreshSleep() {
-        val tick = uptimeMs()
-        val wall = wallClockMs()
-        sleeping = wall - lastWallMs - (tick - lastTickMs) > 15_000L
-        lastTickMs = tick
-        lastWallMs = wall
+        val debt = sleepDebtMs()
+        sleeping = debt - lastSleepDebtMs > 15_000L
+        lastSleepDebtMs = debt
     }
 
     private fun windowTitle(pid: Int): String {
@@ -122,11 +132,12 @@ actual class NativeHost actual constructor() {
     }
 }
 
-private fun uptimeMs(): Long =
-    (clock_gettime_nsec_np(CLOCK_UPTIME_RAW.convert()) / 1_000_000uL).toLong()
+/** CLOCK_MONOTONIC keeps counting while asleep, CLOCK_UPTIME_RAW does not: the gap is sleep time. */
+private fun sleepDebtMs(): Long =
+    (clockMs(CLOCK_MONOTONIC) - clockMs(CLOCK_UPTIME_RAW)).coerceAtLeast(0L)
 
-private fun wallClockMs(): Long =
-    (clock_gettime_nsec_np(CLOCK_REALTIME.convert()) / 1_000_000uL).toLong()
+private fun clockMs(clockId: Int): Long =
+    (clock_gettime_nsec_np(clockId.convert()) / 1_000_000uL).toLong()
 
 private fun cfBoolean(dict: CFDictionaryRef?, key: String): Boolean? {
     val cfKey = CFStringCreateWithCString(null, key, kCFStringEncodingUTF8) ?: return null
