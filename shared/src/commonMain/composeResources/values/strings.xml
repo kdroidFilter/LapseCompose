@@ -71,7 +71,7 @@
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
 
-    <string name="settings_autostart">Start with Windows</string>
+    <string name="settings_autostart">Start at login</string>
     <string name="settings_autostart_subtitle">Launch Lapse when you sign in.</string>
     <string name="settings_always_on_top">Always on top</string>
     <string name="settings_always_on_top_subtitle">Keep the overlay above regular windows.</string>
