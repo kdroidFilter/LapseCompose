@@ -1,7 +1,6 @@
 import dev.nucleusframework.desktop.application.dsl.CompressionLevel
 import dev.nucleusframework.desktop.application.dsl.NativeImageOptimization
 import dev.nucleusframework.desktop.application.dsl.TargetFormat
-import org.apache.tools.ant.taskdefs.modules.Link
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -58,6 +57,9 @@ nucleus.application {
         }
         macOS {
             iconFile.set(project.file("appIcons/MacosIcon.icns"))
+        }
+        linux {
+            iconFile.set(project.file("appIcons/LinuxIcon.png"))
         }
     }
 
