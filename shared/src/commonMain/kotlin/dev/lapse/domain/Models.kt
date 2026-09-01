@@ -118,3 +118,6 @@ object AppConstants {
     const val EXPANDED_WIDTH = 312
     const val EXPANDED_HEIGHT = 356
 }
+
+/** Where the updater stands, surfaced in Settings and the tray. */
+enum class UpdateStatus { Checking, UpToDate, Ready, Unsupported, Failed }

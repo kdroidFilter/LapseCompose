@@ -36,6 +36,7 @@ import dev.lapse.di.createAppGraph
 import dev.lapse.domain.AppConstants
 import dev.lapse.domain.LapsePreferences
 import dev.lapse.domain.OverlayMode
+import dev.lapse.domain.UpdateStatus
 import dev.lapse.overlay.OverlayScreen
 import dev.lapse.theme.LapseTheme
 import dev.lapse.ui.appIconPainter
@@ -46,6 +47,7 @@ import dev.nucleusframework.application.SingleInstanceRestoreEffect
 import dev.nucleusframework.application.nucleusApplication
 import dev.nucleusframework.autolaunch.AutoLaunch
 import dev.nucleusframework.composenativetray.tray.api.Tray
+import dev.nucleusframework.core.runtime.NucleusApp
 import dev.nucleusframework.core.runtime.Platform
 import dev.nucleusframework.globalhotkey.GlobalHotKeyManager
 import dev.nucleusframework.globalhotkey.HotKeyModifier
@@ -81,7 +83,10 @@ import lapse.shared.generated.resources.tray_open
 import lapse.shared.generated.resources.tray_quit
 import lapse.shared.generated.resources.tray_settings
 import lapse.shared.generated.resources.tray_tooltip
+import lapse.shared.generated.resources.tray_check_updates
+import lapse.shared.generated.resources.tray_checking_updates
 import lapse.shared.generated.resources.tray_update_now
+import lapse.shared.generated.resources.tray_version
 import kotlinx.coroutines.flow.distinctUntilChanged
 import org.jetbrains.compose.resources.stringResource
 
@@ -113,7 +118,7 @@ fun main(args: Array<String>) {
     LapseTheme {
         OverlayWindow(vm)
         if (state.dashboardOpen) {
-            DashboardWindow(vm)
+            DashboardWindow(vm, update)
         }
         val overlayVisible = state.overlayVisible
         val dashboardOpen = state.dashboardOpen
@@ -161,7 +166,22 @@ fun main(args: Array<String>) {
                 onCheckedChange = { vm.onIntent(AppIntent.SetGlobalHotkey(it)) },
             )
             Divider()
+            Item(
+                label = if (update.status == UpdateStatus.Checking) {
+                    stringResource(Res.string.tray_checking_updates)
+                } else {
+                    stringResource(Res.string.tray_check_updates)
+                },
+                isEnabled = update.status != UpdateStatus.Checking,
+            ) {
+                update.checkNow()
+            }
             Item(label = stringResource(Res.string.tray_quit)) { vm.onIntent(AppIntent.Quit) }
+            Divider()
+            Item(
+                label = stringResource(Res.string.tray_version, NucleusApp.version.orEmpty().ifBlank { "dev" }),
+                isEnabled = false,
+            )
         }
     }
     }
@@ -229,7 +249,7 @@ private fun NucleusApplicationScope.OverlayWindow(vm: AppViewModel) {
 }
 
 @Composable
-private fun NucleusApplicationScope.DashboardWindow(vm: AppViewModel) {
+private fun NucleusApplicationScope.DashboardWindow(vm: AppViewModel, update: DesktopUpdate) {
     val state by vm.state.collectAsState()
     val windowState = rememberWindowState(
         position = dashboardStartPosition(state.preferences),
@@ -277,6 +297,10 @@ private fun NucleusApplicationScope.DashboardWindow(vm: AppViewModel) {
                 state = state,
                 onIntent = vm::onIntent,
                 contentPadding = contentPadding,
+                updateStatus = update.status,
+                onUpdateAction = {
+                    if (update.status == UpdateStatus.Ready) update.installAndRestart() else update.checkNow()
+                },
             )
         }
     }

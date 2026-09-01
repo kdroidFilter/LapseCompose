@@ -39,6 +39,8 @@ import androidx.compose.material.icons.outlined.Apps
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.SpaceDashboard
 import androidx.compose.material.icons.rounded.History
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -69,6 +71,7 @@ import dev.lapse.app.AppState
 import dev.lapse.domain.ApplicationUsage
 import dev.lapse.domain.ComputerSession
 import dev.lapse.domain.DashboardPage
+import dev.lapse.domain.UpdateStatus
 import dev.lapse.domain.UsageAnalytics
 import dev.lapse.domain.currentTimeMs
 import dev.lapse.theme.LapseColors
@@ -111,6 +114,14 @@ import lapse.shared.generated.resources.settings_autostart
 import lapse.shared.generated.resources.settings_autostart_subtitle
 import lapse.shared.generated.resources.settings_global_hotkey
 import lapse.shared.generated.resources.settings_global_hotkey_subtitle
+import lapse.shared.generated.resources.settings_updates
+import lapse.shared.generated.resources.settings_updates_check
+import lapse.shared.generated.resources.settings_updates_checking
+import lapse.shared.generated.resources.settings_updates_failed
+import lapse.shared.generated.resources.settings_updates_ready
+import lapse.shared.generated.resources.settings_updates_restart
+import lapse.shared.generated.resources.settings_updates_unsupported
+import lapse.shared.generated.resources.settings_updates_up_to_date
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -119,6 +130,8 @@ fun DashboardScreen(
     onIntent: (AppIntent) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
+    updateStatus: UpdateStatus = UpdateStatus.Unsupported,
+    onUpdateAction: () -> Unit = {},
 ) {
     val now = currentTimeMs()
     val sessions = state.allSessions
@@ -140,7 +153,7 @@ fun DashboardScreen(
                     DashboardPage.Overview -> OverviewPage(sessions, now)
                     DashboardPage.Applications -> ApplicationsPage(sessions, now)
                     DashboardPage.Sessions -> SessionsPage(sessions.asReversed(), now)
-                    DashboardPage.Settings -> SettingsPage(state, onIntent)
+                    DashboardPage.Settings -> SettingsPage(state, onIntent, updateStatus, onUpdateAction)
                 }
             }
         }
@@ -501,7 +514,12 @@ private fun SessionsPage(sessions: List<ComputerSession>, nowMs: Long) {
 }
 
 @Composable
-private fun SettingsPage(state: AppState, onIntent: (AppIntent) -> Unit) {
+private fun SettingsPage(
+    state: AppState,
+    onIntent: (AppIntent) -> Unit,
+    updateStatus: UpdateStatus,
+    onUpdateAction: () -> Unit,
+) {
     PageShell(stringResource(Res.string.nav_settings), stringResource(Res.string.page_settings_subtitle)) {
         Column(Modifier.width(620.dp)) {
             SettingRow(
@@ -524,8 +542,46 @@ private fun SettingsPage(state: AppState, onIntent: (AppIntent) -> Unit) {
                 value = state.preferences.globalHotkey,
                 onChanged = { onIntent(AppIntent.SetGlobalHotkey(it)) },
             )
+            Spacer(Modifier.height(8.dp))
+            UpdateRow(updateStatus, onUpdateAction)
         }
     }
+}
+
+@Composable
+private fun UpdateRow(status: UpdateStatus, onAction: () -> Unit) {
+    Panel(Modifier.fillMaxWidth()) {
+        Row(Modifier.padding(16.dp, 12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(stringResource(Res.string.settings_updates), color = LapseColors.text, fontSize = 13.sp)
+                Text(stringResource(updateStatusText(status)), color = LapseColors.textMuted, fontSize = 11.sp)
+            }
+            Button(
+                onClick = onAction,
+                enabled = status != UpdateStatus.Checking,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = LapseColors.accent,
+                    contentColor = Color.White,
+                ),
+            ) {
+                Text(
+                    stringResource(
+                        if (status == UpdateStatus.Ready) Res.string.settings_updates_restart
+                        else Res.string.settings_updates_check,
+                    ),
+                    fontSize = 12.sp,
+                )
+            }
+        }
+    }
+}
+
+private fun updateStatusText(status: UpdateStatus) = when (status) {
+    UpdateStatus.Checking -> Res.string.settings_updates_checking
+    UpdateStatus.UpToDate -> Res.string.settings_updates_up_to_date
+    UpdateStatus.Ready -> Res.string.settings_updates_ready
+    UpdateStatus.Unsupported -> Res.string.settings_updates_unsupported
+    UpdateStatus.Failed -> Res.string.settings_updates_failed
 }
 
 @Composable

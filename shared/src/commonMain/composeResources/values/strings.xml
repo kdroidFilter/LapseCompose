@@ -11,6 +11,9 @@
     <string name="tray_collapse">Collapse</string>
     <string name="tray_quit">Quit Lapse</string>
     <string name="tray_update_now">Update now</string>
+    <string name="tray_check_updates">Check for updates</string>
+    <string name="tray_checking_updates">Checking…</string>
+    <string name="tray_version">Version %1$s</string>
 
     <string name="cd_resume_tracking">Resume tracking</string>
     <string name="cd_pause_tracking">Pause tracking</string>
@@ -78,6 +81,14 @@
     <string name="settings_always_on_top_subtitle">Keep the overlay above regular windows.</string>
     <string name="settings_global_hotkey">Global shortcut</string>
     <string name="settings_global_hotkey_subtitle">Show or hide the overlay with Ctrl+Alt+L from any app.</string>
+    <string name="settings_updates">Updates</string>
+    <string name="settings_updates_check">Check</string>
+    <string name="settings_updates_restart">Restart to install</string>
+    <string name="settings_updates_checking">Checking for updates…</string>
+    <string name="settings_updates_up_to_date">Lapse is up to date.</string>
+    <string name="settings_updates_ready">An update is ready to install.</string>
+    <string name="settings_updates_unsupported">Updates are not available for this installation.</string>
+    <string name="settings_updates_failed">The check failed. Try again later.</string>
 
     <string name="weekday_mon">Mon</string>
     <string name="weekday_tue">Tue</string>
