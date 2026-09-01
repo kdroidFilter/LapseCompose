@@ -6,9 +6,13 @@ import dev.lapse.nativesupport.NativeHost
 import dev.nucleusframework.autolaunch.AutoLaunch
 import dev.nucleusframework.autolaunch.AutoLaunchConfig
 import dev.nucleusframework.autolaunch.AutoLaunchResult
+import dev.nucleusframework.core.runtime.Platform
 import dev.nucleusframework.systeminfo.SystemInfo
 
 actual fun createPlatformBridge(): PlatformBridge = NativePlatformBridge()
+
+actual fun hotkeyLabel(key: Char): String =
+    if (Platform.Current == Platform.MacOS) "⌃⌥$key" else "Ctrl+Alt+$key"
 
 class NativePlatformBridge(
     private val host: NativeHost? = runCatching { NativeHost() }.getOrNull(),

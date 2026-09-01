@@ -74,6 +74,7 @@ import dev.lapse.domain.DashboardPage
 import dev.lapse.domain.UpdateStatus
 import dev.lapse.domain.UsageAnalytics
 import dev.lapse.domain.currentTimeMs
+import dev.lapse.platform.hotkeyLabel
 import dev.lapse.theme.LapseColors
 import dev.lapse.ui.TabularFigures
 import dev.lapse.ui.formatClock
@@ -541,13 +542,13 @@ private fun SettingsPage(
             Spacer(Modifier.height(8.dp))
             SettingRow(
                 title = stringResource(Res.string.settings_global_hotkey),
-                subtitle = stringResource(Res.string.settings_global_hotkey_subtitle),
+                subtitle = stringResource(Res.string.settings_global_hotkey_subtitle, hotkeyLabel('L')),
                 value = state.preferences.globalHotkey,
                 onChanged = { onIntent(AppIntent.SetGlobalHotkey(it)) },
             )
             SettingRow(
                 title = stringResource(Res.string.settings_pause_hotkey),
-                subtitle = stringResource(Res.string.settings_pause_hotkey_subtitle),
+                subtitle = stringResource(Res.string.settings_pause_hotkey_subtitle, hotkeyLabel('P')),
                 value = state.preferences.pauseHotkey,
                 onChanged = { onIntent(AppIntent.SetPauseHotkey(it)) },
             )

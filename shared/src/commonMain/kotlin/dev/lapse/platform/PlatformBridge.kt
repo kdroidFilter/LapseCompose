@@ -28,3 +28,6 @@ class FakePlatformBridge(
         return true
     }
 }
+
+/** The Ctrl+Alt combo under the platform's own name: "⌃⌥L" on macOS, "Ctrl+Alt+L" elsewhere. */
+expect fun hotkeyLabel(key: Char): String

@@ -81,9 +81,9 @@
     <string name="settings_always_on_top">Toujours au premier plan</string>
     <string name="settings_always_on_top_subtitle">Garder la fenêtre au-dessus des autres.</string>
     <string name="settings_global_hotkey">Raccourci global</string>
-    <string name="settings_global_hotkey_subtitle">Afficher ou masquer la fenêtre avec Ctrl+Alt+L depuis n’importe quelle app.</string>
+    <string name="settings_global_hotkey_subtitle">Afficher ou masquer la fenêtre avec %1$s depuis n’importe quelle app.</string>
     <string name="settings_pause_hotkey">Raccourci pause</string>
-    <string name="settings_pause_hotkey_subtitle">Mettre le suivi en pause ou le reprendre avec Ctrl+Alt+P depuis n’importe quelle app.</string>
+    <string name="settings_pause_hotkey_subtitle">Mettre le suivi en pause ou le reprendre avec %1$s depuis n’importe quelle app.</string>
     <string name="settings_updates">Mises à jour</string>
     <string name="settings_updates_check">Rechercher</string>
     <string name="settings_updates_restart">Redémarrer pour installer</string>

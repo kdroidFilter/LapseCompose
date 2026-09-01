@@ -41,6 +41,7 @@ import dev.lapse.domain.LapsePreferences
 import dev.lapse.domain.OverlayMode
 import dev.lapse.domain.UpdateStatus
 import dev.lapse.overlay.OverlayScreen
+import dev.lapse.platform.hotkeyLabel
 import dev.lapse.theme.LapseTheme
 import dev.lapse.ui.UpdateDownloadingColor
 import dev.lapse.ui.UpdateReadyColor
@@ -51,6 +52,8 @@ import dev.nucleusframework.application.NucleusApplicationScope
 import dev.nucleusframework.application.SingleInstanceRestoreEffect
 import dev.nucleusframework.application.nucleusApplication
 import dev.nucleusframework.autolaunch.AutoLaunch
+import dev.nucleusframework.composenativetray.menu.api.Key
+import dev.nucleusframework.composenativetray.menu.api.KeyShortcut
 import dev.nucleusframework.composenativetray.tray.api.Tray
 import dev.nucleusframework.core.runtime.NucleusApp
 import dev.nucleusframework.core.runtime.Platform
@@ -158,12 +161,14 @@ fun main(args: Array<String>) {
             Item(
                 label = stringResource(if (paused) Res.string.cd_resume_tracking else Res.string.cd_pause_tracking),
                 icon = if (paused) Icons.Rounded.PlayArrow else Icons.Rounded.Pause,
+                shortcut = pauseShortcut.takeIf { state.preferences.pauseHotkey },
             ) {
                 vm.onIntent(AppIntent.TogglePause)
             }
             Divider()
             Item(
                 label = if (overlayVisible) stringResource(Res.string.tray_close) else stringResource(Res.string.tray_open),
+                shortcut = overlayShortcut.takeIf { state.preferences.globalHotkey },
             ) {
                 vm.onIntent(AppIntent.ToggleOverlay)
             }
@@ -221,18 +226,22 @@ fun main(args: Array<String>) {
     }
 }
 
+// Display-only hints; the tray renders them as ⌃⌥ on macOS and Ctrl+Alt on Windows/Linux.
+private val overlayShortcut = KeyShortcut(Key.L, ctrl = true, alt = true)
+private val pauseShortcut = KeyShortcut(Key.P, ctrl = true, alt = true)
+
 /** Ctrl+Alt+L toggles the overlay, Ctrl+Alt+P pauses tracking; each behind its preference. */
 @Composable
 private fun GlobalHotkeyEffect(prefs: LapsePreferences, vm: AppViewModel) {
     HotKeyEffect(
         enabled = prefs.globalHotkey,
         keyCode = KeyEvent.VK_L,
-        description = stringResource(Res.string.settings_global_hotkey_subtitle),
+        description = stringResource(Res.string.settings_global_hotkey_subtitle, hotkeyLabel('L')),
     ) { vm.onIntent(AppIntent.ToggleOverlay) }
     HotKeyEffect(
         enabled = prefs.pauseHotkey,
         keyCode = KeyEvent.VK_P,
-        description = stringResource(Res.string.settings_pause_hotkey_subtitle),
+        description = stringResource(Res.string.settings_pause_hotkey_subtitle, hotkeyLabel('P')),
     ) { vm.onIntent(AppIntent.TogglePause) }
 }
 
