@@ -38,6 +38,7 @@ import dev.lapse.domain.LapsePreferences
 import dev.lapse.domain.OverlayMode
 import dev.lapse.overlay.OverlayScreen
 import dev.lapse.theme.LapseTheme
+import dev.lapse.ui.LapseTrayIcon
 import dev.lapse.ui.appIconPainter
 import dev.nucleusframework.application.DecoratedWindow
 import dev.nucleusframework.application.NucleusApplicationScope
@@ -83,7 +84,7 @@ private const val OVERLAY_WORK_AREA_MARGIN_PX = 18
 fun main(args: Array<String>) {
     AutoLaunch.preload()
     val startedAtLogin = AutoLaunch.wasStartedAtLogin(args)
-    nucleusApplication(args) {
+    nucleusApplication(args, dockIconFollowsWindows = true) {
     val graph = remember { createAppGraph() }
     val vm = remember { graph.viewModelFactory.create(::exitApplication) }
     val state by vm.state.collectAsState()
@@ -115,7 +116,8 @@ fun main(args: Array<String>) {
         val overlayCollapsed = state.preferences.overlayMode == OverlayMode.Collapsed
         key(overlayVisible, dashboardOpen, overlayCollapsed) {
             Tray(
-                icon = icon,
+                windowsIcon = icon,
+                macLinuxIcon = LapseTrayIcon,
                 tooltip = trayTooltip,
                 primaryAction = { vm.onIntent(AppIntent.ShowOverlay) },
             ) {
@@ -186,7 +188,7 @@ private fun NucleusApplicationScope.OverlayWindow(vm: AppViewModel) {
         WindowAppearance(WindowAppearanceMode.Dark)
         WindowBackground(LapseColors.background)
         WindowsBackdrop(style = WindowsBackdropStyle.Acrylic)
-        WindowScaffold(modifier = Modifier.macOSLargeCornerRadius()) {
+        WindowScaffold {
             OverlayScreen(
                 state = state,
                 onIntent = vm::onIntent,
@@ -226,6 +228,7 @@ private fun NucleusApplicationScope.DashboardWindow(vm: AppViewModel) {
         icon = appIconPainter(),
         minimumSize = DpSize(760.dp, 520.dp),
         nativeContextMenu = true,
+        hiddenFromDock = false,
     ) {
         val windowScope = this
         val window = nucleusWindow

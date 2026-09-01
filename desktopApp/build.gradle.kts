@@ -44,7 +44,7 @@ nucleus.application {
     nativeDistributions {
         // SQLDelight JdbcSqliteDriver → DriverManager. jlink does not infer java.sql.
         modules("java.sql")
-        targetFormats(TargetFormat.Nsis, TargetFormat.Zip, TargetFormat.Portable)
+        targetFormats(TargetFormat.Nsis, TargetFormat.Zip, TargetFormat.Portable, TargetFormat.Dmg)
         packageName = "Lapse"
         packageVersion = "0.1.0"
         vendor = "Lapse"
@@ -55,6 +55,9 @@ nucleus.application {
             portable {
                 compressionLevel = CompressionLevel.Normal
             }
+        }
+        macOS {
+            iconFile.set(project.file("appIcons/MacosIcon.icns"))
         }
     }
 
