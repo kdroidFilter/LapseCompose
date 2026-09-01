@@ -28,7 +28,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -345,15 +348,22 @@ private fun ApplicationsPage(sessions: List<ComputerSession>, nowMs: Long) {
                 if (usages.isEmpty()) {
                     Empty(stringResource(Res.string.apps_empty), Icons.Outlined.Apps)
                 } else {
-                    LazyColumn {
-                        item {
-                            ApplicationListHeader()
-                            HorizontalDivider(color = LapseColors.border)
+                    val listState = rememberLazyListState()
+                    Box(Modifier.fillMaxSize()) {
+                        LazyColumn(state = listState) {
+                            item {
+                                ApplicationListHeader()
+                                HorizontalDivider(color = LapseColors.border)
+                            }
+                            itemsIndexed(usages) { index, usage ->
+                                ApplicationRow(index + 1, usage, total)
+                                HorizontalDivider(color = LapseColors.border, modifier = Modifier.padding(start = 64.dp))
+                            }
                         }
-                        itemsIndexed(usages) { index, usage ->
-                            ApplicationRow(index + 1, usage, total)
-                            HorizontalDivider(color = LapseColors.border, modifier = Modifier.padding(start = 64.dp))
-                        }
+                        VerticalScrollbar(
+                            rememberScrollbarAdapter(listState),
+                            Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+                        )
                     }
                 }
             }
@@ -447,35 +457,42 @@ private fun SessionsPage(sessions: List<ComputerSession>, nowMs: Long) {
         if (sessions.isEmpty()) {
             Empty(stringResource(Res.string.sessions_empty), Icons.Rounded.History)
         } else {
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                itemsIndexed(sessions) { _, session ->
-                    val completed = session.tasks.count { it.isCompleted }
-                    Panel(Modifier.fillMaxWidth()) {
-                        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Column(Modifier.weight(1f)) {
-                                Text(sessionDateLabel(session.startedAtMs, nowMs), color = LapseColors.text, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                                Spacer(Modifier.height(5.dp))
+            val listState = rememberLazyListState()
+            Box(Modifier.fillMaxSize()) {
+                LazyColumn(state = listState, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    itemsIndexed(sessions) { _, session ->
+                        val completed = session.tasks.count { it.isCompleted }
+                        Panel(Modifier.fillMaxWidth()) {
+                            Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Column(Modifier.weight(1f)) {
+                                    Text(sessionDateLabel(session.startedAtMs, nowMs), color = LapseColors.text, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                                    Spacer(Modifier.height(5.dp))
+                                    Text(
+                                        stringResource(
+                                            Res.string.session_range,
+                                            formatClock(session.startedAtMs),
+                                            session.endedAtMs?.let(::formatClock) ?: stringResource(Res.string.session_current),
+                                        ),
+                                        color = LapseColors.textMuted,
+                                        fontSize = 11.sp,
+                                    )
+                                }
                                 Text(
-                                    stringResource(
-                                        Res.string.session_range,
-                                        formatClock(session.startedAtMs),
-                                        session.endedAtMs?.let(::formatClock) ?: stringResource(Res.string.session_current),
-                                    ),
-                                    color = LapseColors.textMuted,
-                                    fontSize = 11.sp,
+                                    stringResource(Res.string.session_active, formatDurationShort(session.activeDurationMs)),
+                                    color = LapseColors.text,
+                                    fontSize = 12.sp,
+                                    style = TextStyle(fontFeatureSettings = TabularFigures, fontSize = 12.sp, color = LapseColors.text),
                                 )
+                                Spacer(Modifier.width(30.dp))
+                                Text(stringResource(Res.string.session_tasks, completed, session.tasks.size), color = LapseColors.textMuted, fontSize = 11.sp)
                             }
-                            Text(
-                                stringResource(Res.string.session_active, formatDurationShort(session.activeDurationMs)),
-                                color = LapseColors.text,
-                                fontSize = 12.sp,
-                                style = TextStyle(fontFeatureSettings = TabularFigures, fontSize = 12.sp, color = LapseColors.text),
-                            )
-                            Spacer(Modifier.width(30.dp))
-                            Text(stringResource(Res.string.session_tasks, completed, session.tasks.size), color = LapseColors.textMuted, fontSize = 11.sp)
                         }
                     }
                 }
+                VerticalScrollbar(
+                    rememberScrollbarAdapter(listState),
+                    Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+                )
             }
         }
     }

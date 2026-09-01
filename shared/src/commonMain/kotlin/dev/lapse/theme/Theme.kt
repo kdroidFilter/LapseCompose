@@ -1,6 +1,9 @@
 package dev.lapse.theme
 
+import androidx.compose.foundation.LocalScrollbarStyle
+import androidx.compose.foundation.defaultScrollbarStyle
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -10,6 +13,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 
 @Immutable
 class LapseColorScheme(
@@ -69,7 +73,15 @@ val LapseColors: LapseColorScheme
 fun LapseTheme(dark: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     val colors = if (dark) DarkColors else LightColors
     val material = if (dark) darkColorScheme() else lightColorScheme()
-    CompositionLocalProvider(LocalLapseColors provides colors) {
+    CompositionLocalProvider(
+        LocalLapseColors provides colors,
+        LocalScrollbarStyle provides defaultScrollbarStyle().copy(
+            thickness = 8.dp,
+            shape = RoundedCornerShape(4.dp),
+            unhoverColor = colors.textMuted.copy(alpha = 0.30f),
+            hoverColor = colors.textMuted.copy(alpha = 0.60f),
+        ),
+    ) {
         MaterialTheme(
             colorScheme = material.copy(
                 primary = colors.accent,

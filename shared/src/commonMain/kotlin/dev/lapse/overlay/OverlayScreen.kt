@@ -24,12 +24,16 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -258,7 +262,8 @@ private fun ExpandedOverlay(state: AppState, onIntent: (AppIntent) -> Unit, drag
                     fontSize = 11.sp,
                 )
             } else {
-                LazyColumn {
+                val listState = rememberLazyListState()
+                LazyColumn(state = listState) {
                     items(state.session.tasks, key = { it.id }) { task ->
                         if (editingId == task.id) {
                             TaskEditor(
@@ -311,6 +316,10 @@ private fun ExpandedOverlay(state: AppState, onIntent: (AppIntent) -> Unit, drag
                         }
                     }
                 }
+                VerticalScrollbar(
+                    rememberScrollbarAdapter(listState),
+                    Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+                )
             }
         }
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
