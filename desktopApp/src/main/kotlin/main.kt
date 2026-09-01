@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -61,6 +60,7 @@ import dev.nucleusframework.window.material.MaterialDecoratedWindow
 import dev.nucleusframework.window.tao.TaoScreenGeometry
 import dev.nucleusframework.window.windowDragArea
 import dev.lapse.theme.LapseColors
+import kotlinx.coroutines.flow.catch
 import lapse.shared.generated.resources.Res
 import lapse.shared.generated.resources.app_dashboard_title
 import lapse.shared.generated.resources.app_name
@@ -100,59 +100,46 @@ fun main(args: Array<String>) {
         if (state.dashboardOpen) {
             DashboardWindow(vm)
         }
-        val trayTooltip = stringResource(Res.string.tray_tooltip)
-        val trayOpen = stringResource(Res.string.tray_open)
-        val trayClose = stringResource(Res.string.tray_close)
-        val trayDashboard = stringResource(Res.string.tray_dashboard)
-        val trayCloseDashboard = stringResource(Res.string.tray_close_dashboard)
-        val traySettings = stringResource(Res.string.tray_settings)
-        val trayExpand = stringResource(Res.string.tray_expand)
-        val trayCollapse = stringResource(Res.string.tray_collapse)
-        val trayQuit = stringResource(Res.string.tray_quit)
-        val autostartLabel = stringResource(Res.string.settings_autostart)
-        val alwaysOnTopLabel = stringResource(Res.string.settings_always_on_top)
         val overlayVisible = state.overlayVisible
         val dashboardOpen = state.dashboardOpen
         val overlayCollapsed = state.preferences.overlayMode == OverlayMode.Collapsed
-        key(overlayVisible, dashboardOpen, overlayCollapsed) {
-            Tray(
-                windowsIcon = icon,
-                macLinuxIcon = LapseTrayIcon,
-                tooltip = trayTooltip,
-                primaryAction = { vm.onIntent(AppIntent.ShowOverlay) },
+        Tray(
+            windowsIcon = icon,
+            macLinuxIcon = LapseTrayIcon,
+            tooltip = stringResource(Res.string.tray_tooltip),
+            primaryAction = { vm.onIntent(AppIntent.ShowOverlay) },
+        ) {
+            Item(
+                label = if (overlayVisible) stringResource(Res.string.tray_close) else stringResource(Res.string.tray_open),
             ) {
-                Item(
-                    label = if (overlayVisible) trayClose else trayOpen,
-                ) {
-                    vm.onIntent(if (overlayVisible) AppIntent.HideOverlay else AppIntent.ShowOverlay)
-                }
-                Item(
-                    label = if (dashboardOpen) trayCloseDashboard else trayDashboard,
-                ) {
-                    vm.onIntent(if (dashboardOpen) AppIntent.CloseDashboard else AppIntent.OpenDashboard)
-                }
-                Item(label = traySettings) { vm.onIntent(AppIntent.OpenDashboardSettings) }
-                Item(
-                    label = if (overlayCollapsed) trayExpand else trayCollapse,
-                ) {
-                    vm.onIntent(AppIntent.ToggleOverlayMode)
-                    vm.onIntent(AppIntent.ShowOverlay)
-                }
-                CheckableItem(
-                    label = autostartLabel,
-                    checked = state.preferences.autostart,
-                    onCheckedChange = { vm.onIntent(AppIntent.SetAutostart(it)) },
-                )
-                CheckableItem(
-                    label = alwaysOnTopLabel,
-                    checked = state.preferences.alwaysOnTop,
-                    onCheckedChange = { vm.onIntent(AppIntent.SetAlwaysOnTop(it)) },
-                )
-                Divider()
-                Item(label = trayQuit) { vm.onIntent(AppIntent.Quit) }
+                vm.onIntent(if (overlayVisible) AppIntent.HideOverlay else AppIntent.ShowOverlay)
             }
+            Item(
+                label = if (dashboardOpen) stringResource(Res.string.tray_close_dashboard) else stringResource(Res.string.tray_dashboard),
+            ) {
+                vm.onIntent(if (dashboardOpen) AppIntent.CloseDashboard else AppIntent.OpenDashboard)
+            }
+            Item(label = stringResource(Res.string.tray_settings)) { vm.onIntent(AppIntent.OpenDashboardSettings) }
+            Item(
+                label = if (overlayCollapsed) stringResource(Res.string.tray_expand) else stringResource(Res.string.tray_collapse),
+            ) {
+                vm.onIntent(AppIntent.ToggleOverlayMode)
+                vm.onIntent(AppIntent.ShowOverlay)
+            }
+            CheckableItem(
+                label = stringResource(Res.string.settings_autostart),
+                checked = state.preferences.autostart,
+                onCheckedChange = { vm.onIntent(AppIntent.SetAutostart(it)) },
+            )
+            CheckableItem(
+                label = stringResource(Res.string.settings_always_on_top),
+                checked = state.preferences.alwaysOnTop,
+                onCheckedChange = { vm.onIntent(AppIntent.SetAlwaysOnTop(it)) },
+            )
+            Divider()
+            Item(label = stringResource(Res.string.tray_quit)) { vm.onIntent(AppIntent.Quit) }
         }
-    }
+
     }
 }
 
@@ -319,15 +306,14 @@ private fun PersistWindowPlacement(
     LaunchedEffect(windowState) {
         var skipInitial = true
         snapshotFlow { windowState.absolutePlacement() }
-            .distinctUntilChanged()
-            .collect { placement ->
-                if (placement == null) return@collect
-                if (skipInitial) {
-                    skipInitial = false
-                    return@collect
-                }
-                onPlacement(placement.x, placement.y, placement.width, placement.height)
-            }
+                    .distinctUntilChanged().catch { e -> throw e }.collect { placement ->
+                        if (placement == null) return@collect
+                        if (skipInitial) {
+                            skipInitial = false
+                            return@collect
+                        }
+                        onPlacement(placement.x, placement.y, placement.width, placement.height)
+                    }
     }
 }
 
