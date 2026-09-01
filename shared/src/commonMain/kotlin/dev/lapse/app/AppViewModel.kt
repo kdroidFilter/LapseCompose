@@ -283,6 +283,7 @@ class AppViewModel(
         is AppIntent.SetAlwaysOnTop -> s.copy(preferences = s.preferences.copy(alwaysOnTop = intent.value))
         is AppIntent.SetAutostart -> s.copy(preferences = s.preferences.copy(autostart = intent.value))
         is AppIntent.SetGlobalHotkey -> s.copy(preferences = s.preferences.copy(globalHotkey = intent.value))
+        is AppIntent.SetPauseHotkey -> s.copy(preferences = s.preferences.copy(pauseHotkey = intent.value))
         is AppIntent.SaveOverlayPosition -> s.copy(
             preferences = s.preferences.copy(windowX = intent.x, windowY = intent.y),
         )

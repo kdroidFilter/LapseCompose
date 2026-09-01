@@ -32,6 +32,9 @@ import androidx.compose.ui.window.rememberWindowState
 import dev.lapse.app.AppIntent
 import dev.lapse.app.AppViewModel
 import dev.lapse.dashboard.DashboardScreen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Pause
+import androidx.compose.material.icons.rounded.PlayArrow
 import dev.lapse.di.createAppGraph
 import dev.lapse.domain.AppConstants
 import dev.lapse.domain.LapsePreferences
@@ -86,6 +89,10 @@ import lapse.shared.generated.resources.tray_quit
 import lapse.shared.generated.resources.tray_settings
 import lapse.shared.generated.resources.tray_tooltip
 import lapse.shared.generated.resources.tray_check_updates
+import lapse.shared.generated.resources.cd_pause_tracking
+import lapse.shared.generated.resources.cd_resume_tracking
+import lapse.shared.generated.resources.settings_pause_hotkey
+import lapse.shared.generated.resources.settings_pause_hotkey_subtitle
 import lapse.shared.generated.resources.tray_checking_updates
 import lapse.shared.generated.resources.tray_downloading_update
 import lapse.shared.generated.resources.tray_update_now
@@ -121,7 +128,7 @@ fun main(args: Array<String>) {
     val icon = appIconPainter(badge = badgeColor)
 
     SingleInstanceRestoreEffect { vm.onIntent(AppIntent.ShowOverlay) }
-    GlobalHotkeyEffect(enabled = state.preferences.globalHotkey, vm = vm)
+    GlobalHotkeyEffect(prefs = state.preferences, vm = vm)
 
     LapseTheme {
         OverlayWindow(vm)
@@ -147,6 +154,14 @@ fun main(args: Array<String>) {
                 Item(label = stringResource(Res.string.tray_update_now)) { update.installAndRestart() }
                 Divider()
             }
+            val paused = state.session.isPaused
+            Item(
+                label = stringResource(if (paused) Res.string.cd_resume_tracking else Res.string.cd_pause_tracking),
+                icon = if (paused) Icons.Rounded.PlayArrow else Icons.Rounded.Pause,
+            ) {
+                vm.onIntent(AppIntent.TogglePause)
+            }
+            Divider()
             Item(
                 label = if (overlayVisible) stringResource(Res.string.tray_close) else stringResource(Res.string.tray_open),
             ) {
@@ -179,6 +194,11 @@ fun main(args: Array<String>) {
                 checked = state.preferences.globalHotkey,
                 onCheckedChange = { vm.onIntent(AppIntent.SetGlobalHotkey(it)) },
             )
+            CheckableItem(
+                label = stringResource(Res.string.settings_pause_hotkey),
+                checked = state.preferences.pauseHotkey,
+                onCheckedChange = { vm.onIntent(AppIntent.SetPauseHotkey(it)) },
+            )
             Divider()
             Item(
                 label = if (update.status == UpdateStatus.Checking) {
@@ -201,18 +221,31 @@ fun main(args: Array<String>) {
     }
 }
 
-/** Ctrl+Alt+L toggles the overlay from any app while the preference is on. */
+/** Ctrl+Alt+L toggles the overlay, Ctrl+Alt+P pauses tracking; each behind its preference. */
 @Composable
-private fun GlobalHotkeyEffect(enabled: Boolean, vm: AppViewModel) {
-    val description = stringResource(Res.string.settings_global_hotkey_subtitle)
+private fun GlobalHotkeyEffect(prefs: LapsePreferences, vm: AppViewModel) {
+    HotKeyEffect(
+        enabled = prefs.globalHotkey,
+        keyCode = KeyEvent.VK_L,
+        description = stringResource(Res.string.settings_global_hotkey_subtitle),
+    ) { vm.onIntent(AppIntent.ToggleOverlay) }
+    HotKeyEffect(
+        enabled = prefs.pauseHotkey,
+        keyCode = KeyEvent.VK_P,
+        description = stringResource(Res.string.settings_pause_hotkey_subtitle),
+    ) { vm.onIntent(AppIntent.TogglePause) }
+}
+
+@Composable
+private fun HotKeyEffect(enabled: Boolean, keyCode: Int, description: String, onFire: () -> Unit) {
     DisposableEffect(enabled) {
-        // ponytail: fixed combo, no rebinding UI. Add a picker when someone hits a conflict.
+        // ponytail: fixed combos, no rebinding UI. Add a picker when someone hits a conflict.
         val handle = if (enabled && GlobalHotKeyManager.initialize()) {
             GlobalHotKeyManager.register(
-                keyCode = KeyEvent.VK_L,
+                keyCode = keyCode,
                 modifiers = HotKeyModifier.CONTROL + HotKeyModifier.ALT,
                 description = description,
-            ) { _, _ -> vm.onIntent(AppIntent.ToggleOverlay) }
+            ) { _, _ -> onFire() }
         } else {
             -1L
         }

@@ -114,6 +114,8 @@ import lapse.shared.generated.resources.settings_autostart
 import lapse.shared.generated.resources.settings_autostart_subtitle
 import lapse.shared.generated.resources.settings_global_hotkey
 import lapse.shared.generated.resources.settings_global_hotkey_subtitle
+import lapse.shared.generated.resources.settings_pause_hotkey
+import lapse.shared.generated.resources.settings_pause_hotkey_subtitle
 import lapse.shared.generated.resources.settings_updates
 import lapse.shared.generated.resources.settings_updates_check
 import lapse.shared.generated.resources.settings_updates_checking
@@ -542,6 +544,12 @@ private fun SettingsPage(
                 subtitle = stringResource(Res.string.settings_global_hotkey_subtitle),
                 value = state.preferences.globalHotkey,
                 onChanged = { onIntent(AppIntent.SetGlobalHotkey(it)) },
+            )
+            SettingRow(
+                title = stringResource(Res.string.settings_pause_hotkey),
+                subtitle = stringResource(Res.string.settings_pause_hotkey_subtitle),
+                value = state.preferences.pauseHotkey,
+                onChanged = { onIntent(AppIntent.SetPauseHotkey(it)) },
             )
             Spacer(Modifier.height(8.dp))
             UpdateRow(updateStatus, onUpdateAction)

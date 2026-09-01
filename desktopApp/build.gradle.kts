@@ -24,6 +24,7 @@ dependencies {
     implementation(project(":shared"))
     implementation(compose.desktop.currentOs)
     implementation(compose.components.resources)
+    implementation(compose.materialIconsExtended)
     implementation(libs.nucleus.application)
     implementation(libs.nucleus.decorated.window.tao)
     implementation(libs.nucleus.decorated.window.material3)

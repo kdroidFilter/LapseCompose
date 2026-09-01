@@ -18,6 +18,7 @@ private const val KEY_OVERLAY_MODE = "overlayMode"
 private const val KEY_ALWAYS_ON_TOP = "alwaysOnTop"
 private const val KEY_AUTOSTART = "autostart"
 private const val KEY_GLOBAL_HOTKEY = "globalHotkey"
+private const val KEY_PAUSE_HOTKEY = "pauseHotkey"
 private const val KEY_WINDOW_X = "windowX"
 private const val KEY_WINDOW_Y = "windowY"
 private const val KEY_DASHBOARD_X = "dashboardX"
@@ -135,6 +136,7 @@ class PersistentStore(
             alwaysOnTop = settings[KEY_ALWAYS_ON_TOP, defaults.alwaysOnTop],
             autostart = settings[KEY_AUTOSTART, defaults.autostart],
             globalHotkey = settings[KEY_GLOBAL_HOTKEY, defaults.globalHotkey],
+            pauseHotkey = settings[KEY_PAUSE_HOTKEY, defaults.pauseHotkey],
             windowX = settings.getDoubleOrNull(KEY_WINDOW_X),
             windowY = settings.getDoubleOrNull(KEY_WINDOW_Y),
             dashboardX = settings.getDoubleOrNull(KEY_DASHBOARD_X),
@@ -149,6 +151,7 @@ class PersistentStore(
         settings[KEY_ALWAYS_ON_TOP] = prefs.alwaysOnTop
         settings[KEY_AUTOSTART] = prefs.autostart
         settings[KEY_GLOBAL_HOTKEY] = prefs.globalHotkey
+        settings[KEY_PAUSE_HOTKEY] = prefs.pauseHotkey
         settings.putOrRemove(KEY_WINDOW_X, prefs.windowX)
         settings.putOrRemove(KEY_WINDOW_Y, prefs.windowY)
         settings.putOrRemove(KEY_DASHBOARD_X, prefs.dashboardX)

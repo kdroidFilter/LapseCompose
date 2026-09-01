@@ -54,6 +54,7 @@ sealed interface AppIntent {
     data class SetAlwaysOnTop(val value: Boolean) : AppIntent
     data class SetAutostart(val value: Boolean) : AppIntent
     data class SetGlobalHotkey(val value: Boolean) : AppIntent
+    data class SetPauseHotkey(val value: Boolean) : AppIntent
     data class SaveOverlayPosition(val x: Double, val y: Double) : AppIntent
     data class SaveDashboardBounds(val x: Double, val y: Double, val width: Double, val height: Double) : AppIntent
     data object Quit : AppIntent

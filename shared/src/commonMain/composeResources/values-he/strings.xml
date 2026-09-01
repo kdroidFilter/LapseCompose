@@ -82,6 +82,8 @@
     <string name="settings_always_on_top_subtitle">השארת החלון מעל חלונות רגילים.</string>
     <string name="settings_global_hotkey">קיצור דרך גלובלי</string>
     <string name="settings_global_hotkey_subtitle">הצגה או הסתרה של החלון עם Ctrl+Alt+L מכל יישום.</string>
+    <string name="settings_pause_hotkey">קיצור דרך להשהיה</string>
+    <string name="settings_pause_hotkey_subtitle">השהיה או חידוש של המעקב עם Ctrl+Alt+P מכל יישום.</string>
     <string name="settings_updates">עדכונים</string>
     <string name="settings_updates_check">בדיקה</string>
     <string name="settings_updates_restart">הפעלה מחדש להתקנה</string>

@@ -82,6 +82,8 @@
     <string name="settings_always_on_top_subtitle">Keep the overlay above regular windows.</string>
     <string name="settings_global_hotkey">Global shortcut</string>
     <string name="settings_global_hotkey_subtitle">Show or hide the overlay with Ctrl+Alt+L from any app.</string>
+    <string name="settings_pause_hotkey">Pause shortcut</string>
+    <string name="settings_pause_hotkey_subtitle">Pause or resume tracking with Ctrl+Alt+P from any app.</string>
     <string name="settings_updates">Updates</string>
     <string name="settings_updates_check">Check</string>
     <string name="settings_updates_restart">Restart to install</string>

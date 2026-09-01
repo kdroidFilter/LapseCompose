@@ -61,6 +61,8 @@ data class LapsePreferences(
     val autostart: Boolean = false,
     /** Ctrl+Alt+L (Control+Option+L on macOS) toggles the overlay system-wide. */
     val globalHotkey: Boolean = false,
+    /** Ctrl+Alt+P (Control+Option+P on macOS) pauses or resumes tracking system-wide. */
+    val pauseHotkey: Boolean = false,
     /** Overlay origin in logical dp. Null until the user moves it. */
     val windowX: Double? = null,
     val windowY: Double? = null,
