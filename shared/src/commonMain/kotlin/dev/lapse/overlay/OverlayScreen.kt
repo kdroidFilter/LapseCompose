@@ -397,7 +397,7 @@ private fun TaskEditor(
             onValueChange = { if (it.length <= 100) onValueChange(it) },
             modifier = Modifier
                 .weight(1f)
-                .padding(start = 10.dp, top = 9.dp, bottom = 9.dp)
+                .padding(start = 10.dp)
                 .focusRequester(focusRequester)
                 .onFocusChanged { state ->
                     if (state.isFocused) {
@@ -415,7 +415,13 @@ private fun TaskEditor(
             decorationBox = { inner ->
                 Box {
                     if (value.isEmpty()) {
-                        Text(hint, color = LapseColors.textMuted, fontSize = 13.sp)
+                        Text(
+                            hint,
+                            color = LapseColors.textMuted,
+                            fontSize = 13.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
                     }
                     inner()
                 }
