@@ -8,7 +8,7 @@
 └── desktopApp/        # thin Nucleus entry point
 ```
 
-All application code except the window host lives in `shared`. `desktopApp` only starts Nucleus windows and the tray. Platform APIs that Nucleus does not wrap (idle, lock, sleep, foreground process, boot id) live in `native` (`expect` in `nativeMain`, `actual` in `mingwX64Main` / `macosMain`; Linux later) and are called from the JVM through Nucleus Native Access — never C++. Autostart uses `nucleus.autolaunch`. The native Gradle target is host-conditional (`mingwX64` / `macosArm64` / `macosX64`).
+All application code except the window host lives in `shared`. `desktopApp` only starts Nucleus windows and the tray. Idle time and boot id come from `nucleus.system-info`. Lock, sleep, and the focused window live in `native` (`expect` in `nativeMain`, `actual` in `mingwX64Main` / `macosMain` / `linuxMain`) and are called from the JVM through Nucleus Native Access — never C++. Autostart uses `nucleus.autolaunch`. The native Gradle target is host-conditional (`mingwX64` / `macosArm64` / `macosX64` / `linuxX64` / `linuxArm64`).
 
 ## Build
 

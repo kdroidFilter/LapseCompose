@@ -9,7 +9,6 @@ data class ForegroundApp(
 )
 
 data class ActivitySnapshot(
-    val idleMilliseconds: Long,
     val locked: Boolean,
     val sleeping: Boolean,
 )

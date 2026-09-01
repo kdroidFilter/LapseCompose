@@ -7,9 +7,9 @@ kotlinx-coroutines = "1.11.0"
 kotlinx-datetime = "0.8.0"
 androidx-lifecycle = "2.11.0"
 metro = "1.4.2"
-nucleus = "2.5.11"
-nna = "0.7.0"
-composenativetray = "2.1.4"
+nucleus = "2.5.12"
+nna = "0.7.1"
+composenativetray = "2.1.5"
 structured-coroutines = "1.1.1"
 stability-analyzer = "0.12.0"
 multiplatform-settings = "1.3.0"
@@ -37,6 +37,7 @@ nucleus-decorated-window-material3 = { module = "dev.nucleusframework:nucleus.de
 nucleus-core-runtime = { module = "dev.nucleusframework:nucleus.core-runtime", version.ref = "nucleus" }
 nucleus-system-color = { module = "dev.nucleusframework:nucleus.system-color", version.ref = "nucleus" }
 nucleus-autolaunch = { module = "dev.nucleusframework:nucleus.autolaunch", version.ref = "nucleus" }
+nucleus-system-info = { module = "dev.nucleusframework:nucleus.system-info", version.ref = "nucleus" }
 composenativetray = { module = "dev.nucleusframework:composenativetray", version.ref = "composenativetray" }
 structured-coroutines-annotations = { module = "io.github.santimattius:structured-coroutines-annotations", version.ref = "structured-coroutines" }
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }

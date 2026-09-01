@@ -16,7 +16,6 @@ import kotlinx.cinterop.convert
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
 import kotlinx.cinterop.reinterpret
-import kotlinx.cinterop.sizeOf
 import kotlinx.cinterop.toKString
 import kotlinx.cinterop.value
 import platform.AppKit.NSWorkspace
@@ -33,25 +32,18 @@ import platform.CoreFoundation.CFStringGetLength
 import platform.CoreFoundation.CFStringGetMaximumSizeForEncoding
 import platform.CoreFoundation.kCFNumberIntType
 import platform.CoreFoundation.kCFStringEncodingUTF8
-import platform.CoreGraphics.CGEventSourceSecondsSinceLastEventType
-import platform.CoreGraphics.CGEventType
 import platform.CoreGraphics.CGSessionCopyCurrentDictionary
 import platform.CoreGraphics.CGWindowListCopyWindowInfo
-import platform.CoreGraphics.kCGEventSourceStateCombinedSessionState
 import platform.CoreGraphics.kCGNullWindowID
 import platform.CoreGraphics.kCGWindowLayer
 import platform.CoreGraphics.kCGWindowListExcludeDesktopElements
 import platform.CoreGraphics.kCGWindowListOptionOnScreenOnly
 import platform.CoreGraphics.kCGWindowName
 import platform.CoreGraphics.kCGWindowOwnerPID
-import platform.darwin.sysctlbyname
 import platform.posix.CLOCK_REALTIME
 import platform.posix.CLOCK_UPTIME_RAW
 import platform.posix.clock_gettime_nsec_np
-import platform.posix.size_tVar
-import platform.posix.timeval
 
-private val kCGAnyInputEventType: CGEventType = 0xFFFFFFFFu
 private const val LOCKED_KEY = "CGSSessionScreenIsLocked"
 private const val ON_CONSOLE_KEY = "kCGSSessionOnConsoleKey"
 
@@ -63,21 +55,9 @@ actual class NativeHost actual constructor() {
     actual fun activitySnapshot(): ActivitySnapshot {
         refreshSleep()
         return ActivitySnapshot(
-            idleMilliseconds = idleMilliseconds(),
             locked = isLocked(),
             sleeping = sleeping,
         )
-    }
-
-    actual fun bootId(): String {
-        memScoped {
-            val bootTime = alloc<timeval>()
-            val size = alloc<size_tVar>()
-            size.value = sizeOf<timeval>().convert()
-            val rc = sysctlbyname("kern.boottime", bootTime.ptr, size.ptr, null, 0u.convert())
-            if (rc == 0) return bootTime.tv_sec.toString()
-        }
-        return ((wallClockMs() - uptimeMs()) / 60_000L).toString()
     }
 
     actual fun foregroundApplication(): ForegroundApp? = autoreleasepool {
@@ -95,15 +75,6 @@ actual class NativeHost actual constructor() {
             displayName = displayName,
             windowTitle = windowTitle(pid),
         )
-    }
-
-    private fun idleMilliseconds(): Long {
-        val seconds = CGEventSourceSecondsSinceLastEventType(
-            kCGEventSourceStateCombinedSessionState,
-            kCGAnyInputEventType,
-        )
-        if (!seconds.isFinite() || seconds < 0.0) return 0L
-        return (seconds * 1000.0).toLong()
     }
 
     private fun isLocked(): Boolean {

@@ -42,6 +42,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.nucleus.autolaunch)
             implementation(libs.nucleus.core.runtime)
+            implementation(libs.nucleus.system.info)
             implementation(libs.sqlDelight.driver.sqlite)
             implementation(libs.sqlite.jdbc)
             implementation(project(":native"))

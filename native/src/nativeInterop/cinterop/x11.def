@@ -1,0 +1,6 @@
+package = lapse.x11
+headers = X11/Xlib.h X11/Xatom.h X11/X.h
+headerFilter = X11/**
+compilerOpts = -I/usr/include -I/usr/include/x86_64-linux-gnu -I/usr/include/aarch64-linux-gnu
+linkerOpts = -L/usr/lib/x86_64-linux-gnu -L/usr/lib/aarch64-linux-gnu -lX11
+---

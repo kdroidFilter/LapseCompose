@@ -13,7 +13,18 @@ kotlin {
             if (arch == "aarch64" || arch == "arm64") macosArm64() else macosX64()
         }
         Os.isFamily(Os.FAMILY_WINDOWS) -> mingwX64()
-        else -> error("Native host target is not configured for this OS")
+        else -> {
+            val arch = System.getProperty("os.arch").orEmpty()
+            val linux = if (arch == "aarch64" || arch == "arm64") linuxArm64() else linuxX64()
+            linux.compilations.getByName("main").cinterops {
+                val x11 by creating {
+                    defFile(project.file("src/nativeInterop/cinterop/x11.def"))
+                }
+                val dbus by creating {
+                    defFile(project.file("src/nativeInterop/cinterop/dbus.def"))
+                }
+            }
+        }
     }
     jvm()
     compilerOptions {

@@ -4,10 +4,8 @@ package dev.lapse.nativesupport
 
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.allocArray
-import kotlinx.cinterop.convert
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
-import kotlinx.cinterop.sizeOf
 import kotlinx.cinterop.toKString
 import kotlinx.cinterop.value
 import platform.windows.CloseDesktop
@@ -15,15 +13,12 @@ import platform.windows.CloseHandle
 import platform.windows.DWORDVar
 import platform.windows.FILETIME
 import platform.windows.GetForegroundWindow
-import platform.windows.GetLastInputInfo
 import platform.windows.GetSystemTimeAsFileTime
-import platform.windows.GetTickCount
 import platform.windows.GetTickCount64
 import platform.windows.GetUserObjectInformationW
 import platform.windows.GetWindowTextLengthW
 import platform.windows.GetWindowTextW
 import platform.windows.GetWindowThreadProcessId
-import platform.windows.LASTINPUTINFO
 import platform.windows.OpenInputDesktop
 import platform.windows.OpenProcess
 import platform.windows.PROCESS_QUERY_LIMITED_INFORMATION
@@ -41,17 +36,9 @@ actual class NativeHost actual constructor() {
     actual fun activitySnapshot(): ActivitySnapshot {
         refreshSleep()
         return ActivitySnapshot(
-            idleMilliseconds = idleMilliseconds(),
             locked = isLocked(),
             sleeping = sleeping,
         )
-    }
-
-    actual fun bootId(): String {
-        val wall = wallClockMs()
-        val tick = GetTickCount64().toLong()
-        val bootMinute = (wall - tick) / 60_000L
-        return bootMinute.toString()
     }
 
     actual fun foregroundApplication(): ForegroundApp? = memScoped {
@@ -85,16 +72,6 @@ actual class NativeHost actual constructor() {
         } finally {
             CloseHandle(process)
         }
-    }
-
-    private fun idleMilliseconds(): Long = memScoped {
-        val info = alloc<LASTINPUTINFO>()
-        info.cbSize = sizeOf<LASTINPUTINFO>().convert()
-        if (GetLastInputInfo(info.ptr) == 0) return 0L
-        val now = GetTickCount().toLong() and 0xFFFFFFFFL
-        val last = info.dwTime.toLong() and 0xFFFFFFFFL
-        val idle = now - last
-        if (idle < 0) idle + 0x1_0000_0000L else idle
     }
 
     private fun isLocked(): Boolean = memScoped {

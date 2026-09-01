@@ -1,6 +1,6 @@
 # Lapse
 
-A quiet Windows companion for active-time tracking and session-focused tasks.
+A quiet desktop companion for active-time tracking and session-focused tasks.
 
 This is a Nucleus + Compose Multiplatform rewrite of [zTomz/Lapse](https://github.com/zTomz/Lapse). The original Flutter/C++ runner is replaced by Kotlin, Metro DI, MVVM+MVI, and Nucleus Native Access instead of hand-written C++.
 
@@ -10,12 +10,16 @@ This is a Nucleus + Compose Multiplatform rewrite of [zTomz/Lapse](https://githu
 .\gradlew :desktopApp:run
 ```
 
+```sh
+./gradlew :desktopApp:run
+```
+
 Requires JDK 25.
 
 ## Layout
 
 ```
-native/       Kotlin/Native Win32 + macOS (idle, lock, sleep, foreground app, boot id) via NNA
+native/       Kotlin/Native (lock, sleep, foreground app) via NNA; idle + boot id from nucleus.system-info
 shared/       domain, persistence, Metro graph, ViewModel, Compose UI
 desktopApp/   Nucleus entry: overlay + dashboard + tray + autolaunch
 ```
