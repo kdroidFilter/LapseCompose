@@ -1,0 +1,118 @@
+<resources>
+    <string name="app_name">Lapse</string>
+    <string name="app_dashboard_title">לוח הבקרה של Lapse</string>
+    <string name="tray_tooltip">Lapse — זמן פעיל</string>
+    <string name="tray_open">פתיחת Lapse</string>
+    <string name="tray_close">סגירת Lapse</string>
+    <string name="tray_dashboard">פתיחת לוח הבקרה</string>
+    <string name="tray_close_dashboard">סגירת לוח הבקרה</string>
+    <string name="tray_settings">הגדרות</string>
+    <string name="tray_expand">הרחבה</string>
+    <string name="tray_collapse">כיווץ</string>
+    <string name="tray_quit">יציאה מ־Lapse</string>
+    <string name="tray_update_now">עדכון עכשיו</string>
+    <string name="tray_check_updates">בדיקת עדכונים</string>
+    <string name="tray_checking_updates">בודק…</string>
+    <string name="tray_version">גרסה %1$s</string>
+
+    <string name="cd_resume_tracking">חידוש המעקב</string>
+    <string name="cd_pause_tracking">השהיית המעקב</string>
+    <string name="cd_expand">הרחבת Lapse</string>
+    <string name="cd_collapse">כיווץ</string>
+    <string name="cd_hide_tray">הסתרה למגש המערכת</string>
+    <string name="cd_open_dashboard">פתיחת לוח הבקרה של Lapse</string>
+    <string name="cd_edit_task">עריכת המשימה</string>
+    <string name="cd_delete_task">מחיקת המשימה</string>
+
+    <string name="overlay_todo">משימות</string>
+    <string name="overlay_add_task">הוספת משימה</string>
+    <string name="overlay_no_tasks">אין משימות בהפעלה הזו</string>
+    <string name="overlay_task_hint_add">מה צריך לעשות?</string>
+    <string name="overlay_task_hint_edit">עדכון כותרת המשימה</string>
+    <string name="overlay_save_task">שמירת המשימה</string>
+
+    <string name="status_active">פעיל</string>
+    <string name="status_paused">מושהה</string>
+    <string name="status_idle">ללא פעילות</string>
+    <string name="status_locked">נעול</string>
+    <string name="status_sleeping">שינה</string>
+
+    <string name="activity_active">הפעלה פעילה</string>
+    <string name="activity_paused">המעקב מושהה</string>
+    <string name="activity_idle">מושהה בזמן חוסר פעילות</string>
+    <string name="activity_locked">מושהה כשהמסך נעול</string>
+    <string name="activity_sleeping">מושהה כשהמחשב במצב שינה</string>
+
+    <string name="nav_workspace">סביבת עבודה</string>
+    <string name="nav_dashboard">לוח בקרה</string>
+    <string name="nav_applications">יישומים</string>
+    <string name="nav_sessions">הפעלות</string>
+    <string name="nav_settings">הגדרות</string>
+
+    <string name="page_dashboard_subtitle">זמן העבודה הפעיל שלך במחשב במבט אחד.</string>
+    <string name="page_applications_subtitle">שימוש ביישומים בחזית בזמן ש־Lapse היה פעיל.</string>
+    <string name="page_sessions_subtitle">הפעלות אחרונות השמורות במכשיר הזה.</string>
+    <string name="page_settings_subtitle">קביעת אופן הפעולה של Lapse במחשב הזה.</string>
+
+    <string name="metric_today">היום</string>
+    <string name="metric_seven_day_average">ממוצע 7 ימים</string>
+    <string name="metric_this_week">השבוע</string>
+    <string name="metric_sessions_today">הפעלות היום</string>
+    <string name="metric_active_time">זמן פעיל</string>
+
+    <string name="apps_tracked_today">נמדדו היום</string>
+    <string name="apps_tracked_seven_days">נמדדו ב־7 ימים</string>
+    <string name="apps_empty">עדיין לא נרשם שימוש ביישומים.</string>
+    <string name="period_today">היום</string>
+    <string name="period_seven_days">7 הימים האחרונים</string>
+    <string name="percent">%1$d%%</string>
+
+    <string name="sessions_empty">עדיין לא נרשמו הפעלות.</string>
+    <string name="session_current">נוכחית</string>
+    <string name="session_range">%1$s – %2$s</string>
+    <string name="session_active">פעיל %1$s</string>
+    <string name="session_tasks">משימות %1$d / %2$d</string>
+    <string name="today">היום</string>
+    <string name="yesterday">אתמול</string>
+
+    <string name="settings_autostart">הפעלה בכניסה למערכת</string>
+    <string name="settings_autostart_subtitle">הפעלת Lapse עם הכניסה למשתמש.</string>
+    <string name="settings_always_on_top">תמיד עליון</string>
+    <string name="settings_always_on_top_subtitle">השארת החלון מעל חלונות רגילים.</string>
+    <string name="settings_global_hotkey">קיצור דרך גלובלי</string>
+    <string name="settings_global_hotkey_subtitle">הצגה או הסתרה של החלון עם Ctrl+Alt+L מכל יישום.</string>
+    <string name="settings_updates">עדכונים</string>
+    <string name="settings_updates_check">בדיקה</string>
+    <string name="settings_updates_restart">הפעלה מחדש להתקנה</string>
+    <string name="settings_updates_checking">בודק עדכונים…</string>
+    <string name="settings_updates_up_to_date">Lapse מעודכן.</string>
+    <string name="settings_updates_ready">עדכון מוכן להתקנה.</string>
+    <string name="settings_updates_unsupported">עדכונים אינם זמינים בהתקנה הזו.</string>
+    <string name="settings_updates_failed">הבדיקה נכשלה. אפשר לנסות שוב מאוחר יותר.</string>
+
+    <string name="weekday_mon">ב׳</string>
+    <string name="weekday_tue">ג׳</string>
+    <string name="weekday_wed">ד׳</string>
+    <string name="weekday_thu">ה׳</string>
+    <string name="weekday_fri">ו׳</string>
+    <string name="weekday_sat">ש׳</string>
+    <string name="weekday_sun">א׳</string>
+    <string name="weekday_monday">יום שני</string>
+    <string name="weekday_tuesday">יום שלישי</string>
+    <string name="weekday_wednesday">יום רביעי</string>
+    <string name="weekday_thursday">יום חמישי</string>
+    <string name="weekday_friday">יום שישי</string>
+    <string name="weekday_saturday">יום שבת</string>
+    <string name="weekday_sunday">יום ראשון</string>
+    <string name="chart_date">%1$s %2$s.%3$s.%4$d</string>
+    <string name="chart_share_caption">פעיל · חלק מ־7 ימים</string>
+    <string name="apps_header_application">יישום</string>
+    <string name="apps_header_time">זמן</string>
+    <string name="apps_header_share">חלק</string>
+
+    <string name="duration_seconds">%1$d שנ׳</string>
+    <string name="duration_minutes">%1$d דק׳</string>
+    <string name="duration_hours_minutes">%1$d ש׳ %2$s</string>
+
+    <string name="error_native_unavailable">חלק מתכונות המערכת אינן זמינות.</string>
+</resources>

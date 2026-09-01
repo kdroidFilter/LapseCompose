@@ -1,0 +1,118 @@
+<resources>
+    <string name="app_name">Lapse</string>
+    <string name="app_dashboard_title">Tableau de bord Lapse</string>
+    <string name="tray_tooltip">Lapse — temps actif</string>
+    <string name="tray_open">Ouvrir Lapse</string>
+    <string name="tray_close">Fermer Lapse</string>
+    <string name="tray_dashboard">Ouvrir le tableau de bord</string>
+    <string name="tray_close_dashboard">Fermer le tableau de bord</string>
+    <string name="tray_settings">Réglages</string>
+    <string name="tray_expand">Agrandir</string>
+    <string name="tray_collapse">Réduire</string>
+    <string name="tray_quit">Quitter Lapse</string>
+    <string name="tray_update_now">Mettre à jour maintenant</string>
+    <string name="tray_check_updates">Rechercher des mises à jour</string>
+    <string name="tray_checking_updates">Recherche en cours…</string>
+    <string name="tray_version">Version %1$s</string>
+
+    <string name="cd_resume_tracking">Reprendre le suivi</string>
+    <string name="cd_pause_tracking">Mettre le suivi en pause</string>
+    <string name="cd_expand">Agrandir Lapse</string>
+    <string name="cd_collapse">Réduire</string>
+    <string name="cd_hide_tray">Réduire dans la barre d’état</string>
+    <string name="cd_open_dashboard">Ouvrir le tableau de bord Lapse</string>
+    <string name="cd_edit_task">Modifier la tâche</string>
+    <string name="cd_delete_task">Supprimer la tâche</string>
+
+    <string name="overlay_todo">À FAIRE</string>
+    <string name="overlay_add_task">Ajouter une tâche</string>
+    <string name="overlay_no_tasks">Aucune tâche pour cette session</string>
+    <string name="overlay_task_hint_add">Que faut-il faire ?</string>
+    <string name="overlay_task_hint_edit">Modifier le titre de la tâche</string>
+    <string name="overlay_save_task">Enregistrer la tâche</string>
+
+    <string name="status_active">ACTIF</string>
+    <string name="status_paused">EN PAUSE</string>
+    <string name="status_idle">INACTIF</string>
+    <string name="status_locked">VERROUILLÉ</string>
+    <string name="status_sleeping">EN VEILLE</string>
+
+    <string name="activity_active">Session active</string>
+    <string name="activity_paused">Suivi en pause</string>
+    <string name="activity_idle">En pause pendant l’inactivité</string>
+    <string name="activity_locked">En pause pendant le verrouillage de l’écran</string>
+    <string name="activity_sleeping">En pause pendant la veille du PC</string>
+
+    <string name="nav_workspace">ESPACE DE TRAVAIL</string>
+    <string name="nav_dashboard">Tableau de bord</string>
+    <string name="nav_applications">Applications</string>
+    <string name="nav_sessions">Sessions</string>
+    <string name="nav_settings">Réglages</string>
+
+    <string name="page_dashboard_subtitle">Votre temps d’activité sur cet ordinateur en un coup d’œil.</string>
+    <string name="page_applications_subtitle">Applications au premier plan pendant que Lapse était actif.</string>
+    <string name="page_sessions_subtitle">Sessions récentes enregistrées sur cet appareil.</string>
+    <string name="page_settings_subtitle">Choisissez le comportement de Lapse sur cet ordinateur.</string>
+
+    <string name="metric_today">Aujourd’hui</string>
+    <string name="metric_seven_day_average">Moyenne sur 7 jours</string>
+    <string name="metric_this_week">Cette semaine</string>
+    <string name="metric_sessions_today">Sessions aujourd’hui</string>
+    <string name="metric_active_time">Temps actif</string>
+
+    <string name="apps_tracked_today">suivi aujourd’hui</string>
+    <string name="apps_tracked_seven_days">suivi sur 7 jours</string>
+    <string name="apps_empty">Aucune utilisation d’application enregistrée.</string>
+    <string name="period_today">Aujourd’hui</string>
+    <string name="period_seven_days">7 derniers jours</string>
+    <string name="percent">%1$d %%</string>
+
+    <string name="sessions_empty">Aucune session enregistrée.</string>
+    <string name="session_current">En cours</string>
+    <string name="session_range">%1$s – %2$s</string>
+    <string name="session_active">Actif %1$s</string>
+    <string name="session_tasks">Tâches %1$d / %2$d</string>
+    <string name="today">Aujourd’hui</string>
+    <string name="yesterday">Hier</string>
+
+    <string name="settings_autostart">Démarrer à l’ouverture de session</string>
+    <string name="settings_autostart_subtitle">Lancer Lapse dès la connexion.</string>
+    <string name="settings_always_on_top">Toujours au premier plan</string>
+    <string name="settings_always_on_top_subtitle">Garder la fenêtre au-dessus des autres.</string>
+    <string name="settings_global_hotkey">Raccourci global</string>
+    <string name="settings_global_hotkey_subtitle">Afficher ou masquer la fenêtre avec Ctrl+Alt+L depuis n’importe quelle app.</string>
+    <string name="settings_updates">Mises à jour</string>
+    <string name="settings_updates_check">Rechercher</string>
+    <string name="settings_updates_restart">Redémarrer pour installer</string>
+    <string name="settings_updates_checking">Recherche de mises à jour…</string>
+    <string name="settings_updates_up_to_date">Lapse est à jour.</string>
+    <string name="settings_updates_ready">Une mise à jour est prête à être installée.</string>
+    <string name="settings_updates_unsupported">Les mises à jour ne sont pas disponibles pour cette installation.</string>
+    <string name="settings_updates_failed">Échec de la recherche. Réessayez plus tard.</string>
+
+    <string name="weekday_mon">lun</string>
+    <string name="weekday_tue">mar</string>
+    <string name="weekday_wed">mer</string>
+    <string name="weekday_thu">jeu</string>
+    <string name="weekday_fri">ven</string>
+    <string name="weekday_sat">sam</string>
+    <string name="weekday_sun">dim</string>
+    <string name="weekday_monday">Lundi</string>
+    <string name="weekday_tuesday">Mardi</string>
+    <string name="weekday_wednesday">Mercredi</string>
+    <string name="weekday_thursday">Jeudi</string>
+    <string name="weekday_friday">Vendredi</string>
+    <string name="weekday_saturday">Samedi</string>
+    <string name="weekday_sunday">Dimanche</string>
+    <string name="chart_date">%1$s %2$s.%3$s.%4$d</string>
+    <string name="chart_share_caption">actif · part sur 7 jours</string>
+    <string name="apps_header_application">APPLICATION</string>
+    <string name="apps_header_time">TEMPS</string>
+    <string name="apps_header_share">PART</string>
+
+    <string name="duration_seconds">%1$d s</string>
+    <string name="duration_minutes">%1$d min</string>
+    <string name="duration_hours_minutes">%1$d h %2$s</string>
+
+    <string name="error_native_unavailable">Certaines fonctions système sont indisponibles.</string>
+</resources>
