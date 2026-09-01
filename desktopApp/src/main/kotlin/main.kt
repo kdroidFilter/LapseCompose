@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -109,37 +110,45 @@ fun main(args: Array<String>) {
         val trayQuit = stringResource(Res.string.tray_quit)
         val autostartLabel = stringResource(Res.string.settings_autostart)
         val alwaysOnTopLabel = stringResource(Res.string.settings_always_on_top)
-        Tray(
-            icon = icon,
-            tooltip = trayTooltip,
-            primaryAction = { vm.onIntent(AppIntent.ShowOverlay) },
-        ) {
-            Item(
-                label = if (state.overlayVisible) trayClose else trayOpen,
+        val overlayVisible = state.overlayVisible
+        val dashboardOpen = state.dashboardOpen
+        val overlayCollapsed = state.preferences.overlayMode == OverlayMode.Collapsed
+        key(overlayVisible, dashboardOpen, overlayCollapsed) {
+            Tray(
+                icon = icon,
+                tooltip = trayTooltip,
+                primaryAction = { vm.onIntent(AppIntent.ShowOverlay) },
             ) {
-                vm.onIntent(if (state.overlayVisible) AppIntent.HideOverlay else AppIntent.ShowOverlay)
+                Item(
+                    label = if (overlayVisible) trayClose else trayOpen,
+                ) {
+                    vm.onIntent(if (overlayVisible) AppIntent.HideOverlay else AppIntent.ShowOverlay)
+                }
+                Item(
+                    label = if (dashboardOpen) trayCloseDashboard else trayDashboard,
+                ) {
+                    vm.onIntent(if (dashboardOpen) AppIntent.CloseDashboard else AppIntent.OpenDashboard)
+                }
+                Item(label = traySettings) { vm.onIntent(AppIntent.OpenDashboardSettings) }
+                Item(
+                    label = if (overlayCollapsed) trayExpand else trayCollapse,
+                ) {
+                    vm.onIntent(AppIntent.ToggleOverlayMode)
+                    vm.onIntent(AppIntent.ShowOverlay)
+                }
+                CheckableItem(
+                    label = autostartLabel,
+                    checked = state.preferences.autostart,
+                    onCheckedChange = { vm.onIntent(AppIntent.SetAutostart(it)) },
+                )
+                CheckableItem(
+                    label = alwaysOnTopLabel,
+                    checked = state.preferences.alwaysOnTop,
+                    onCheckedChange = { vm.onIntent(AppIntent.SetAlwaysOnTop(it)) },
+                )
+                Divider()
+                Item(label = trayQuit) { vm.onIntent(AppIntent.Quit) }
             }
-            Item(
-                label = if (state.dashboardOpen) trayCloseDashboard else trayDashboard,
-            ) {
-                vm.onIntent(if (state.dashboardOpen) AppIntent.CloseDashboard else AppIntent.OpenDashboard)
-            }
-            Item(label = traySettings) { vm.onIntent(AppIntent.OpenDashboardSettings) }
-            Item(
-                label = if (state.preferences.overlayMode == OverlayMode.Collapsed) trayExpand else trayCollapse,
-            ) { vm.onIntent(AppIntent.ToggleOverlayMode) }
-            CheckableItem(
-                label = autostartLabel,
-                checked = state.preferences.autostart,
-                onCheckedChange = { vm.onIntent(AppIntent.SetAutostart(it)) },
-            )
-            CheckableItem(
-                label = alwaysOnTopLabel,
-                checked = state.preferences.alwaysOnTop,
-                onCheckedChange = { vm.onIntent(AppIntent.SetAlwaysOnTop(it)) },
-            )
-            Divider()
-            Item(label = trayQuit) { vm.onIntent(AppIntent.Quit) }
         }
     }
     }
