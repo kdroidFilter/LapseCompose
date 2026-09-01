@@ -236,10 +236,17 @@ private fun dev.lapse.overlay.TaskRow(task: dev.lapse.domain.SessionTask, onTogg
     - onDelete: STABLE (function type)
 
 @Composable
-public fun dev.lapse.theme.LapseTheme(content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
+public fun dev.lapse.theme.LapseColors(): dev.lapse.theme.LapseColorScheme
+  skippable: false
+  restartable: false
+  params:
+
+@Composable
+public fun dev.lapse.theme.LapseTheme(dark: kotlin.Boolean, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
+    - dark: STABLE (primitive type)
     - content: STABLE (composable function type)
 
 @Composable
@@ -257,10 +264,11 @@ public fun dev.lapse.ui.activitySubtitle(state: dev.lapse.domain.UserActivitySta
     - state: STABLE (class with no mutable properties)
 
 @Composable
-public fun dev.lapse.ui.appIconPainter(): androidx.compose.ui.graphics.painter.Painter
+public fun dev.lapse.ui.appIconPainter(badge: kotlin.Boolean): androidx.compose.ui.graphics.painter.Painter
   skippable: false
   restartable: false
   params:
+    - badge: STABLE (primitive type)
 
 @Composable
 public fun dev.lapse.ui.formatDurationShort(durationMs: kotlin.Long): kotlin.String
@@ -276,6 +284,13 @@ public fun dev.lapse.ui.sessionDateLabel(epochMs: kotlin.Long, nowMs: kotlin.Lon
   params:
     - epochMs: STABLE (primitive type)
     - nowMs: STABLE (primitive type)
+
+@Composable
+public fun dev.lapse.ui.statusColor(state: dev.lapse.domain.UserActivityState): androidx.compose.ui.graphics.Color
+  skippable: false
+  restartable: false
+  params:
+    - state: STABLE (class with no mutable properties)
 
 @Composable
 public fun dev.lapse.ui.weekdayLong(isoDayOfWeek: kotlin.Int): kotlin.String

@@ -20,4 +20,6 @@ All application code except the window host lives in `shared`. `desktopApp` only
 | macOS packages | `./gradlew :desktopApp:packageGraalvmDmg :desktopApp:packageGraalvmZip` |
 | Windows package | `./gradlew :desktopApp:packageGraalvmNsis` |
 
+Auto-update: `desktopApp/src/main/kotlin/Update.kt` checks the GitHub releases once at startup and downloads in the background. When an installer is waiting the tray icon grows a dot and an "Update now" item; otherwise it installs on quit.
+
 Release: push a `v*` tag. GitHub Actions (Nucleus `setup-nucleus` / `generate-update-yml` / `publish-release`) builds GraalVM installers for macOS (arm64 + x64) and Windows (x64) and publishes a GitHub Release. Linux is not in the matrix yet.

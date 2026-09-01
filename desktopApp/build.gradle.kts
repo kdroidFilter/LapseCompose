@@ -30,6 +30,8 @@ dependencies {
     implementation(libs.nucleus.core.runtime)
     implementation(libs.nucleus.system.color)
     implementation(libs.nucleus.autolaunch)
+    implementation(libs.nucleus.native.http)
+    implementation(libs.nucleus.updater.runtime)
     implementation(libs.composenativetray)
 }
 

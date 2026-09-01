@@ -10,6 +10,7 @@
     <string name="tray_expand">Expand</string>
     <string name="tray_collapse">Collapse</string>
     <string name="tray_quit">Quit Lapse</string>
+    <string name="tray_update_now">Update now</string>
 
     <string name="cd_resume_tracking">Resume tracking</string>
     <string name="cd_pause_tracking">Pause tracking</string>

@@ -37,8 +37,8 @@ import dev.lapse.domain.LapsePreferences
 import dev.lapse.domain.OverlayMode
 import dev.lapse.overlay.OverlayScreen
 import dev.lapse.theme.LapseTheme
-import dev.lapse.ui.LapseTrayIcon
 import dev.lapse.ui.appIconPainter
+import dev.lapse.ui.trayIcon
 import dev.nucleusframework.application.DecoratedWindow
 import dev.nucleusframework.application.NucleusApplicationScope
 import dev.nucleusframework.application.SingleInstanceRestoreEffect
@@ -75,6 +75,7 @@ import lapse.shared.generated.resources.tray_open
 import lapse.shared.generated.resources.tray_quit
 import lapse.shared.generated.resources.tray_settings
 import lapse.shared.generated.resources.tray_tooltip
+import lapse.shared.generated.resources.tray_update_now
 import kotlinx.coroutines.flow.distinctUntilChanged
 import org.jetbrains.compose.resources.stringResource
 
@@ -86,12 +87,19 @@ fun main(args: Array<String>) {
     val startedAtLogin = AutoLaunch.wasStartedAtLogin(args)
     nucleusApplication(args, dockIconFollowsWindows = true) {
     val graph = remember { createAppGraph() }
-    val vm = remember { graph.viewModelFactory.create(::exitApplication) }
+    val update = rememberDesktopUpdate()
+    // Quitting is the silent install window: nothing to restart, nothing to ask.
+    val vm = remember {
+        graph.viewModelFactory.create {
+            update.installOnQuit()
+            exitApplication()
+        }
+    }
     val state by vm.state.collectAsState()
     LaunchedEffect(Unit) {
         if (startedAtLogin) vm.onIntent(AppIntent.HideOverlay)
     }
-    val icon = appIconPainter()
+    val icon = appIconPainter(badge = update.ready)
 
     SingleInstanceRestoreEffect { vm.onIntent(AppIntent.ShowOverlay) }
 
@@ -105,10 +113,14 @@ fun main(args: Array<String>) {
         val overlayCollapsed = state.preferences.overlayMode == OverlayMode.Collapsed
         Tray(
             windowsIcon = icon,
-            macLinuxIcon = LapseTrayIcon,
+            macLinuxIcon = trayIcon(badge = update.ready),
             tooltip = stringResource(Res.string.tray_tooltip),
             primaryAction = { vm.onIntent(AppIntent.ShowOverlay) },
         ) {
+            if (update.ready) {
+                Item(label = stringResource(Res.string.tray_update_now)) { update.installAndRestart() }
+                Divider()
+            }
             Item(
                 label = if (overlayVisible) stringResource(Res.string.tray_close) else stringResource(Res.string.tray_open),
             ) {
