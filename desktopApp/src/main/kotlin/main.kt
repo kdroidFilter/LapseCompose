@@ -139,7 +139,7 @@ fun main(args: Array<String>) {
             Divider()
             Item(label = stringResource(Res.string.tray_quit)) { vm.onIntent(AppIntent.Quit) }
         }
-
+    }
     }
 }
 
