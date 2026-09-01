@@ -58,7 +58,9 @@ data class ComputerSession(
 data class LapsePreferences(
     val overlayMode: OverlayMode = OverlayMode.Expanded,
     val alwaysOnTop: Boolean = true,
-    val autostart: Boolean = true,
+    val autostart: Boolean = false,
+    /** Ctrl+Alt+L (Control+Option+L on macOS) toggles the overlay system-wide. */
+    val globalHotkey: Boolean = false,
     /** Overlay origin in logical dp. Null until the user moves it. */
     val windowX: Double? = null,
     val windowY: Double? = null,

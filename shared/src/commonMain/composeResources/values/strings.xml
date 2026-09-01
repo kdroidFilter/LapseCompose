@@ -76,6 +76,8 @@
     <string name="settings_autostart_subtitle">Launch Lapse when you sign in.</string>
     <string name="settings_always_on_top">Always on top</string>
     <string name="settings_always_on_top_subtitle">Keep the overlay above regular windows.</string>
+    <string name="settings_global_hotkey">Global shortcut</string>
+    <string name="settings_global_hotkey_subtitle">Show or hide the overlay with Ctrl+Alt+L from any app.</string>
 
     <string name="weekday_mon">Mon</string>
     <string name="weekday_tue">Tue</string>

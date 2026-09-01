@@ -109,6 +109,8 @@ import lapse.shared.generated.resources.settings_always_on_top
 import lapse.shared.generated.resources.settings_always_on_top_subtitle
 import lapse.shared.generated.resources.settings_autostart
 import lapse.shared.generated.resources.settings_autostart_subtitle
+import lapse.shared.generated.resources.settings_global_hotkey
+import lapse.shared.generated.resources.settings_global_hotkey_subtitle
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -514,6 +516,13 @@ private fun SettingsPage(state: AppState, onIntent: (AppIntent) -> Unit) {
                 subtitle = stringResource(Res.string.settings_always_on_top_subtitle),
                 value = state.preferences.alwaysOnTop,
                 onChanged = { onIntent(AppIntent.SetAlwaysOnTop(it)) },
+            )
+            Spacer(Modifier.height(8.dp))
+            SettingRow(
+                title = stringResource(Res.string.settings_global_hotkey),
+                subtitle = stringResource(Res.string.settings_global_hotkey_subtitle),
+                value = state.preferences.globalHotkey,
+                onChanged = { onIntent(AppIntent.SetGlobalHotkey(it)) },
             )
         }
     }

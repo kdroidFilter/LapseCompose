@@ -267,6 +267,7 @@ class AppViewModel(
         )
         AppIntent.HideOverlay -> s.copy(overlayVisible = false)
         AppIntent.ShowOverlay -> s.copy(overlayVisible = true)
+        AppIntent.ToggleOverlay -> s.copy(overlayVisible = !s.overlayVisible)
         AppIntent.OpenDashboard -> s.copy(
             dashboardOpen = true,
             dashboardPage = DashboardPage.Overview,
@@ -281,6 +282,7 @@ class AppViewModel(
         is AppIntent.SetDashboardPage -> s.copy(dashboardPage = intent.page)
         is AppIntent.SetAlwaysOnTop -> s.copy(preferences = s.preferences.copy(alwaysOnTop = intent.value))
         is AppIntent.SetAutostart -> s.copy(preferences = s.preferences.copy(autostart = intent.value))
+        is AppIntent.SetGlobalHotkey -> s.copy(preferences = s.preferences.copy(globalHotkey = intent.value))
         is AppIntent.SaveOverlayPosition -> s.copy(
             preferences = s.preferences.copy(windowX = intent.x, windowY = intent.y),
         )
@@ -300,6 +302,7 @@ class AppViewModel(
             is AppIntent.SetAutostart -> platform.setAutostartEnabled(intent.value)
             AppIntent.HideOverlay,
             AppIntent.ShowOverlay,
+            AppIntent.ToggleOverlay,
             is AppIntent.SetDashboardPage,
             -> Unit
             else -> persist()

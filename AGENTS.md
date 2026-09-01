@@ -20,6 +20,8 @@ All application code except the window host lives in `shared`. `desktopApp` only
 | macOS packages | `./gradlew :desktopApp:packageGraalvmDmg :desktopApp:packageGraalvmZip` |
 | Windows package | `./gradlew :desktopApp:packageGraalvmNsis` |
 
+Global hotkey: `Ctrl+Alt+L` toggles the overlay through `nucleus.global-hotkey`, registered in `desktopApp/src/main/kotlin/main.kt` and gated by the `globalHotkey` preference (Settings row + tray checkbox), off by default like autostart. The combo is fixed; the native side maps the AWT key code and the portable modifier flags to Carbon (`ALT` → optionKey, `CONTROL` → controlKey).
+
 Auto-update: `desktopApp/src/main/kotlin/Update.kt` checks the GitHub releases once at startup and downloads in the background. When an installer is waiting the tray icon grows a dot and an "Update now" item; otherwise it installs on quit.
 
 Release: push a `v*` tag. GitHub Actions (Nucleus `setup-nucleus` / `generate-update-yml` / `publish-release`) builds GraalVM installers for macOS (arm64 + x64) and Windows (x64) and publishes a GitHub Release. Linux is not in the matrix yet.

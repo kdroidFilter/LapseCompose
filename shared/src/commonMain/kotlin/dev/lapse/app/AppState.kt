@@ -46,12 +46,14 @@ sealed interface AppIntent {
     data object ToggleOverlayMode : AppIntent
     data object HideOverlay : AppIntent
     data object ShowOverlay : AppIntent
+    data object ToggleOverlay : AppIntent
     data object OpenDashboard : AppIntent
     data object OpenDashboardSettings : AppIntent
     data object CloseDashboard : AppIntent
     data class SetDashboardPage(val page: DashboardPage) : AppIntent
     data class SetAlwaysOnTop(val value: Boolean) : AppIntent
     data class SetAutostart(val value: Boolean) : AppIntent
+    data class SetGlobalHotkey(val value: Boolean) : AppIntent
     data class SaveOverlayPosition(val x: Double, val y: Double) : AppIntent
     data class SaveDashboardBounds(val x: Double, val y: Double, val width: Double, val height: Double) : AppIntent
     data object Quit : AppIntent

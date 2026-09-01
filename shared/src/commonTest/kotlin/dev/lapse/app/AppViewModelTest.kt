@@ -134,4 +134,21 @@ class AppViewModelTest {
         assertEquals(3 * 60_000, viewModel.state.value.displayDurationMs)
 
     }
+
+    @Test
+    fun toggleOverlayFlipsVisibility() {
+        val viewModel = vm(store = MemoryStore(persisted()), platform = FakePlatformBridge("boot-a"))
+        assertTrue(viewModel.state.value.overlayVisible)
+        viewModel.onIntent(AppIntent.ToggleOverlay)
+        assertFalse(viewModel.state.value.overlayVisible)
+        viewModel.onIntent(AppIntent.ToggleOverlay)
+        assertTrue(viewModel.state.value.overlayVisible)
+    }
+
+    @Test
+    fun setGlobalHotkeyUpdatesPrefs() {
+        val viewModel = vm(store = MemoryStore(persisted()), platform = FakePlatformBridge("boot-a"))
+        viewModel.onIntent(AppIntent.SetGlobalHotkey(false))
+        assertFalse(viewModel.state.value.preferences.globalHotkey)
+    }
 }

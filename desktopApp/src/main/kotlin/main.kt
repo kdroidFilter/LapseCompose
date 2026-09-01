@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -46,6 +47,8 @@ import dev.nucleusframework.application.nucleusApplication
 import dev.nucleusframework.autolaunch.AutoLaunch
 import dev.nucleusframework.composenativetray.tray.api.Tray
 import dev.nucleusframework.core.runtime.Platform
+import dev.nucleusframework.globalhotkey.GlobalHotKeyManager
+import dev.nucleusframework.globalhotkey.HotKeyModifier
 import dev.nucleusframework.window.DecoratedWindowScope
 import dev.nucleusframework.window.LocalWindowChromeInsets
 import dev.nucleusframework.window.WindowAppearance
@@ -60,12 +63,15 @@ import dev.nucleusframework.window.material.MaterialDecoratedWindow
 import dev.nucleusframework.window.tao.TaoScreenGeometry
 import dev.nucleusframework.window.windowDragArea
 import dev.lapse.theme.LapseColors
+import java.awt.event.KeyEvent
 import kotlinx.coroutines.flow.catch
 import lapse.shared.generated.resources.Res
 import lapse.shared.generated.resources.app_dashboard_title
 import lapse.shared.generated.resources.app_name
 import lapse.shared.generated.resources.settings_always_on_top
 import lapse.shared.generated.resources.settings_autostart
+import lapse.shared.generated.resources.settings_global_hotkey
+import lapse.shared.generated.resources.settings_global_hotkey_subtitle
 import lapse.shared.generated.resources.tray_collapse
 import lapse.shared.generated.resources.tray_dashboard
 import lapse.shared.generated.resources.tray_expand
@@ -102,6 +108,7 @@ fun main(args: Array<String>) {
     val icon = appIconPainter(badge = update.ready)
 
     SingleInstanceRestoreEffect { vm.onIntent(AppIntent.ShowOverlay) }
+    GlobalHotkeyEffect(enabled = state.preferences.globalHotkey, vm = vm)
 
     LapseTheme {
         OverlayWindow(vm)
@@ -115,7 +122,7 @@ fun main(args: Array<String>) {
             windowsIcon = icon,
             macLinuxIcon = trayIcon(badge = update.ready),
             tooltip = stringResource(Res.string.tray_tooltip),
-            primaryAction = { vm.onIntent(if (overlayVisible) AppIntent.HideOverlay else AppIntent.ShowOverlay) },
+            primaryAction = { vm.onIntent(AppIntent.ToggleOverlay) },
         ) {
             if (update.ready) {
                 Item(label = stringResource(Res.string.tray_update_now)) { update.installAndRestart() }
@@ -124,7 +131,7 @@ fun main(args: Array<String>) {
             Item(
                 label = if (overlayVisible) stringResource(Res.string.tray_close) else stringResource(Res.string.tray_open),
             ) {
-                vm.onIntent(if (overlayVisible) AppIntent.HideOverlay else AppIntent.ShowOverlay)
+                vm.onIntent(AppIntent.ToggleOverlay)
             }
             Item(
                 label = if (dashboardOpen) stringResource(Res.string.tray_close_dashboard) else stringResource(Res.string.tray_dashboard),
@@ -148,10 +155,34 @@ fun main(args: Array<String>) {
                 checked = state.preferences.alwaysOnTop,
                 onCheckedChange = { vm.onIntent(AppIntent.SetAlwaysOnTop(it)) },
             )
+            CheckableItem(
+                label = stringResource(Res.string.settings_global_hotkey),
+                checked = state.preferences.globalHotkey,
+                onCheckedChange = { vm.onIntent(AppIntent.SetGlobalHotkey(it)) },
+            )
             Divider()
             Item(label = stringResource(Res.string.tray_quit)) { vm.onIntent(AppIntent.Quit) }
         }
     }
+    }
+}
+
+/** Ctrl+Alt+L toggles the overlay from any app while the preference is on. */
+@Composable
+private fun GlobalHotkeyEffect(enabled: Boolean, vm: AppViewModel) {
+    val description = stringResource(Res.string.settings_global_hotkey_subtitle)
+    DisposableEffect(enabled) {
+        // ponytail: fixed combo, no rebinding UI. Add a picker when someone hits a conflict.
+        val handle = if (enabled && GlobalHotKeyManager.initialize()) {
+            GlobalHotKeyManager.register(
+                keyCode = KeyEvent.VK_L,
+                modifiers = HotKeyModifier.CONTROL + HotKeyModifier.ALT,
+                description = description,
+            ) { _, _ -> vm.onIntent(AppIntent.ToggleOverlay) }
+        } else {
+            -1L
+        }
+        onDispose { if (handle != -1L) GlobalHotKeyManager.unregister(handle) }
     }
 }
 
