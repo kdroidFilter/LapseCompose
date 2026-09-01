@@ -1,3 +1,4 @@
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.LayoutDirection
@@ -32,9 +36,6 @@ import androidx.compose.ui.window.rememberWindowState
 import dev.lapse.app.AppIntent
 import dev.lapse.app.AppViewModel
 import dev.lapse.dashboard.DashboardScreen
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Pause
-import androidx.compose.material.icons.rounded.PlayArrow
 import dev.lapse.di.createAppGraph
 import dev.lapse.domain.AppConstants
 import dev.lapse.domain.LapsePreferences
@@ -43,6 +44,7 @@ import dev.lapse.domain.UpdateStatus
 import dev.lapse.overlay.OverlayScreen
 import dev.lapse.platform.hotkeyLabel
 import dev.lapse.theme.LapseTheme
+import dev.lapse.ui.PausedColor
 import dev.lapse.ui.UpdateDownloadingColor
 import dev.lapse.ui.UpdateReadyColor
 import dev.lapse.ui.appIconPainter
@@ -55,6 +57,7 @@ import dev.nucleusframework.autolaunch.AutoLaunch
 import dev.nucleusframework.composenativetray.menu.api.Key
 import dev.nucleusframework.composenativetray.menu.api.KeyShortcut
 import dev.nucleusframework.composenativetray.tray.api.Tray
+import dev.nucleusframework.composenativetray.utils.isMenuBarInDarkMode
 import dev.nucleusframework.core.runtime.NucleusApp
 import dev.nucleusframework.core.runtime.Platform
 import dev.nucleusframework.globalhotkey.GlobalHotKeyManager
@@ -126,9 +129,10 @@ fun main(args: Array<String>) {
     val badgeColor = when {
         update.downloading -> UpdateDownloadingColor
         update.ready -> UpdateReadyColor
+        state.session.isPaused -> PausedColor
         else -> null
     }
-    val icon = appIconPainter(badge = badgeColor)
+    val menuBarColor = if (isMenuBarInDarkMode()) Color.White else Color.Black
 
     SingleInstanceRestoreEffect { vm.onIntent(AppIntent.ShowOverlay) }
     GlobalHotkeyEffect(prefs = state.preferences, vm = vm)
@@ -142,10 +146,7 @@ fun main(args: Array<String>) {
         val dashboardOpen = state.dashboardOpen
         val overlayCollapsed = state.preferences.overlayMode == OverlayMode.Collapsed
         Tray(
-            windowsIcon = icon,
-            macLinuxIcon = trayIcon(badge = badgeColor != null),
-            // The menu-bar vector is tinted whole, so amber is the only way to say "downloading".
-            tint = if (update.downloading) UpdateDownloadingColor else null,
+            iconContent = { TrayIcon(badge = badgeColor, monochrome = menuBarColor) },
             tooltip = stringResource(Res.string.tray_tooltip),
             primaryAction = { vm.onIntent(AppIntent.ToggleOverlay) },
         ) {
@@ -160,7 +161,6 @@ fun main(args: Array<String>) {
             val paused = state.session.isPaused
             Item(
                 label = stringResource(if (paused) Res.string.cd_resume_tracking else Res.string.cd_pause_tracking),
-                icon = if (paused) Icons.Rounded.PlayArrow else Icons.Rounded.Pause,
                 shortcut = pauseShortcut.takeIf { state.preferences.pauseHotkey },
             ) {
                 vm.onIntent(AppIntent.TogglePause)
@@ -223,6 +223,31 @@ fun main(args: Array<String>) {
             )
         }
     }
+    }
+}
+
+/**
+ * Colour app icon on Windows, monochrome menu-bar L elsewhere, with [badge] as a status dot in the
+ * free top-right corner. Rendered off-screen by the tray, so it gets no composition locals.
+ */
+@Composable
+private fun TrayIcon(badge: Color?, monochrome: Color) {
+    Box(Modifier.fillMaxSize()) {
+        if (Platform.Current == Platform.Windows) {
+            Image(painter = appIconPainter(), contentDescription = null, modifier = Modifier.fillMaxSize())
+        } else {
+            Image(
+                imageVector = trayIcon(),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                colorFilter = ColorFilter.tint(monochrome),
+            )
+        }
+        if (badge != null) {
+            Canvas(Modifier.fillMaxSize()) {
+                drawCircle(badge, size.minDimension * 0.15f, Offset(size.width * 0.8125f, size.height * 0.1875f))
+            }
+        }
     }
 }
 
