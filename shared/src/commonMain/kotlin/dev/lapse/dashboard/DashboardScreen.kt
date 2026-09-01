@@ -117,6 +117,7 @@ import lapse.shared.generated.resources.settings_global_hotkey_subtitle
 import lapse.shared.generated.resources.settings_updates
 import lapse.shared.generated.resources.settings_updates_check
 import lapse.shared.generated.resources.settings_updates_checking
+import lapse.shared.generated.resources.settings_updates_downloading
 import lapse.shared.generated.resources.settings_updates_failed
 import lapse.shared.generated.resources.settings_updates_ready
 import lapse.shared.generated.resources.settings_updates_restart
@@ -558,7 +559,7 @@ private fun UpdateRow(status: UpdateStatus, onAction: () -> Unit) {
             }
             Button(
                 onClick = onAction,
-                enabled = status != UpdateStatus.Checking,
+                enabled = status != UpdateStatus.Checking && status != UpdateStatus.Downloading,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = LapseColors.accent,
                     contentColor = Color.White,
@@ -578,6 +579,7 @@ private fun UpdateRow(status: UpdateStatus, onAction: () -> Unit) {
 
 private fun updateStatusText(status: UpdateStatus) = when (status) {
     UpdateStatus.Checking -> Res.string.settings_updates_checking
+    UpdateStatus.Downloading -> Res.string.settings_updates_downloading
     UpdateStatus.UpToDate -> Res.string.settings_updates_up_to_date
     UpdateStatus.Ready -> Res.string.settings_updates_ready
     UpdateStatus.Unsupported -> Res.string.settings_updates_unsupported

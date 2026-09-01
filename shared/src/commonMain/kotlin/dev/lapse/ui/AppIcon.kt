@@ -16,12 +16,16 @@ import lapse.shared.generated.resources.Res
 import lapse.shared.generated.resources.app_icon
 import org.jetbrains.compose.resources.painterResource
 
-/** App icon; [badge] marks a downloaded update waiting to install. */
+/** App icon; [badge] is the update dot's colour, or null for no dot. */
 @Composable
-fun appIconPainter(badge: Boolean = false): Painter {
+fun appIconPainter(badge: Color? = null): Painter {
     val base = painterResource(Res.drawable.app_icon)
-    return if (badge) remember(base) { BadgedPainter(base) } else base
+    return if (badge != null) remember(base, badge) { BadgedPainter(base, badge) } else base
 }
+
+/** Amber while an update downloads, green once it is ready to install. */
+val UpdateDownloadingColor = Color(0xFFE0A800)
+val UpdateReadyColor = Color(0xFF59C58C)
 
 /**
  * Monochrome L for the tray; CNT tints it white or black from the menu bar.
@@ -64,14 +68,12 @@ private var _trayIcon: ImageVector? = null
 private var _badgedTrayIcon: ImageVector? = null
 
 /** The colour app icon with the same update dot drawn over its top-right corner. */
-private class BadgedPainter(private val base: Painter) : Painter() {
+private class BadgedPainter(private val base: Painter, private val color: Color) : Painter() {
     override val intrinsicSize get() = base.intrinsicSize
 
     override fun DrawScope.onDraw() {
         with(base) { draw(size) }
         val radius = size.minDimension * 0.2f
-        drawCircle(BadgeColor, radius, Offset(size.width - radius, radius))
+        drawCircle(color, radius, Offset(size.width - radius, radius))
     }
 }
-
-private val BadgeColor = Color(0xFF59C58C)

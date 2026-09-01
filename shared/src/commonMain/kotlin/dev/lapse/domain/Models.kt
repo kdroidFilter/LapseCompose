@@ -120,4 +120,4 @@ object AppConstants {
 }
 
 /** Where the updater stands, surfaced in Settings and the tray. */
-enum class UpdateStatus { Checking, UpToDate, Ready, Unsupported, Failed }
+enum class UpdateStatus { Checking, Downloading, UpToDate, Ready, Unsupported, Failed }

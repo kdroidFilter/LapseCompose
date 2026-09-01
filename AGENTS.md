@@ -22,7 +22,7 @@ All application code except the window host lives in `shared`. `desktopApp` only
 
 Global hotkey: `Ctrl+Alt+L` toggles the overlay through `nucleus.global-hotkey`, registered in `desktopApp/src/main/kotlin/main.kt` and gated by the `globalHotkey` preference (Settings row + tray checkbox), off by default like autostart. The combo is fixed; the native side maps the AWT key code and the portable modifier flags to Carbon (`ALT` → optionKey, `CONTROL` → controlKey).
 
-Auto-update: `desktopApp/src/main/kotlin/Update.kt` checks the GitHub releases once at startup and downloads in the background. When an installer is waiting the tray icon grows a dot and an "Update now" item; otherwise it installs on quit. Settings and the tray also offer a manual check (`DesktopUpdate.checkNow`, state in `UpdateStatus`); the last tray item is a disabled `NucleusApp.version` label.
+Auto-update: `desktopApp/src/main/kotlin/Update.kt` checks the GitHub releases once at startup and downloads in the background. While a download runs the tray badge is amber (the macOS/Linux vector is tinted whole) with a disabled "Downloading an update…" item; when the installer is waiting the badge turns green and an "Update now" item shows up; otherwise it installs on quit. Settings and the tray also offer a manual check (`DesktopUpdate.checkNow`, state in `UpdateStatus`); the last tray item is a disabled `NucleusApp.version` label.
 
 UI strings live in `shared/src/commonMain/composeResources/values/strings.xml` (English, the default) with full translations in `values-fr/` and `values-he/`. All three files must keep the same keys. The Hebrew UI is not mirrored — the layout stays LTR.
 

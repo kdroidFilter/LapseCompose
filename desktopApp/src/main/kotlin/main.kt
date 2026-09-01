@@ -39,6 +39,8 @@ import dev.lapse.domain.OverlayMode
 import dev.lapse.domain.UpdateStatus
 import dev.lapse.overlay.OverlayScreen
 import dev.lapse.theme.LapseTheme
+import dev.lapse.ui.UpdateDownloadingColor
+import dev.lapse.ui.UpdateReadyColor
 import dev.lapse.ui.appIconPainter
 import dev.lapse.ui.trayIcon
 import dev.nucleusframework.application.DecoratedWindow
@@ -85,6 +87,7 @@ import lapse.shared.generated.resources.tray_settings
 import lapse.shared.generated.resources.tray_tooltip
 import lapse.shared.generated.resources.tray_check_updates
 import lapse.shared.generated.resources.tray_checking_updates
+import lapse.shared.generated.resources.tray_downloading_update
 import lapse.shared.generated.resources.tray_update_now
 import lapse.shared.generated.resources.tray_version
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -110,7 +113,12 @@ fun main(args: Array<String>) {
     LaunchedEffect(Unit) {
         if (startedAtLogin) vm.onIntent(AppIntent.HideOverlay)
     }
-    val icon = appIconPainter(badge = update.ready)
+    val badgeColor = when {
+        update.downloading -> UpdateDownloadingColor
+        update.ready -> UpdateReadyColor
+        else -> null
+    }
+    val icon = appIconPainter(badge = badgeColor)
 
     SingleInstanceRestoreEffect { vm.onIntent(AppIntent.ShowOverlay) }
     GlobalHotkeyEffect(enabled = state.preferences.globalHotkey, vm = vm)
@@ -125,10 +133,16 @@ fun main(args: Array<String>) {
         val overlayCollapsed = state.preferences.overlayMode == OverlayMode.Collapsed
         Tray(
             windowsIcon = icon,
-            macLinuxIcon = trayIcon(badge = update.ready),
+            macLinuxIcon = trayIcon(badge = badgeColor != null),
+            // The menu-bar vector is tinted whole, so amber is the only way to say "downloading".
+            tint = if (update.downloading) UpdateDownloadingColor else null,
             tooltip = stringResource(Res.string.tray_tooltip),
             primaryAction = { vm.onIntent(AppIntent.ToggleOverlay) },
         ) {
+            if (update.downloading) {
+                Item(label = stringResource(Res.string.tray_downloading_update), isEnabled = false)
+                Divider()
+            }
             if (update.ready) {
                 Item(label = stringResource(Res.string.tray_update_now)) { update.installAndRestart() }
                 Divider()
@@ -172,7 +186,7 @@ fun main(args: Array<String>) {
                 } else {
                     stringResource(Res.string.tray_check_updates)
                 },
-                isEnabled = update.status != UpdateStatus.Checking,
+                isEnabled = update.status != UpdateStatus.Checking && !update.downloading,
             ) {
                 update.checkNow()
             }

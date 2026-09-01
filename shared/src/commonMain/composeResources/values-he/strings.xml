@@ -13,6 +13,7 @@
     <string name="tray_update_now">עדכון עכשיו</string>
     <string name="tray_check_updates">בדיקת עדכונים</string>
     <string name="tray_checking_updates">בודק…</string>
+    <string name="tray_downloading_update">מוריד עדכון…</string>
     <string name="tray_version">גרסה %1$s</string>
 
     <string name="cd_resume_tracking">חידוש המעקב</string>
@@ -85,6 +86,7 @@
     <string name="settings_updates_check">בדיקה</string>
     <string name="settings_updates_restart">הפעלה מחדש להתקנה</string>
     <string name="settings_updates_checking">בודק עדכונים…</string>
+    <string name="settings_updates_downloading">מוריד עדכון…</string>
     <string name="settings_updates_up_to_date">Lapse מעודכן.</string>
     <string name="settings_updates_ready">עדכון מוכן להתקנה.</string>
     <string name="settings_updates_unsupported">עדכונים אינם זמינים בהתקנה הזו.</string>

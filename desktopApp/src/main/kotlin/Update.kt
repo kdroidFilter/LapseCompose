@@ -30,6 +30,9 @@ class DesktopUpdate internal constructor(
     private val statusState: MutableState<UpdateStatus>,
     private val scope: CoroutineScope,
 ) {
+    /** True while an installer is being fetched in the background. */
+    val downloading: Boolean get() = statusState.value == UpdateStatus.Downloading
+
     /** True once the installer is downloaded and waiting. */
     val ready: Boolean get() = downloaded.value != null
 
@@ -66,6 +69,7 @@ class DesktopUpdate internal constructor(
                 statusState.value = UpdateStatus.UpToDate
                 return
             }
+            statusState.value = UpdateStatus.Downloading
             updater.downloadUpdate(available.info).collect { progress ->
                 progress.file?.let {
                     downloaded.value = it
