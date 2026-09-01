@@ -11,6 +11,7 @@ import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.pointed
 import kotlinx.cinterop.ptr
+import kotlinx.cinterop.get
 import kotlinx.cinterop.reinterpret
 import kotlinx.cinterop.staticCFunction
 import kotlinx.cinterop.toKString
@@ -45,7 +46,8 @@ internal object LinuxX11 {
         if (window == 0uL) return null
         val pid = windowPid(dpy, window) ?: return null
         val title = windowTitle(dpy, window)
-        return processFromPid(pid, title)
+        val wmClass = windowWmClass(dpy, window)
+        return processFromPid(pid, title, wmClass)
     }
 
     private fun activeWindow(dpy: CPointer<Display>): Window? {
@@ -67,6 +69,27 @@ internal object LinuxX11 {
             readString(dpy, window, netName, utf8)?.let { return it }
         }
         return readString(dpy, window, XA_STRING, XA_STRING).orEmpty()
+    }
+
+    private fun windowWmClass(dpy: CPointer<Display>, window: Window): String {
+        val atom = XInternAtom(dpy, "WM_CLASS", False)
+        if (atom == 0uL) return ""
+        val property = readProperty(dpy, window, atom, XA_STRING, 256) ?: return ""
+        try {
+            val raw = ByteArray(property.nitems) { property.bytes[it].toByte() }
+            val parts = buildList {
+                var start = 0
+                for (i in raw.indices) {
+                    if (raw[i] != 0.toByte()) continue
+                    if (i > start) add(raw.decodeToString(start, i))
+                    start = i + 1
+                }
+                if (start < raw.size) add(raw.decodeToString(start, raw.size))
+            }.filter { it.isNotEmpty() }
+            return parts.getOrNull(1) ?: parts.firstOrNull().orEmpty()
+        } finally {
+            XFree(property.bytes)
+        }
     }
 
     private fun readULong(
@@ -93,7 +116,7 @@ internal object LinuxX11 {
         return text
     }
 
-    private class RawProperty(val bytes: CPointer<UByteVar>)
+    private class RawProperty(val bytes: CPointer<UByteVar>, val nitems: Int)
 
     private fun readProperty(
         dpy: CPointer<Display>,
@@ -126,6 +149,6 @@ internal object LinuxX11 {
             if (data != null) XFree(data)
             return null
         }
-        RawProperty(data)
+        RawProperty(data, nitems.value.toInt().coerceAtLeast(0))
     }
 }

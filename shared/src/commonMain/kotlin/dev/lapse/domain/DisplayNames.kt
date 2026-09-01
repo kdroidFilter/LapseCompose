@@ -11,7 +11,9 @@ fun applicationDisplayName(
     if (genericMetadata && title.isNotEmpty() && !isGenericApplicationName(title)) {
         return title
     }
-    if (reported.isEmpty() || genericMetadata || isExecutableName(reported)) {
+    if (reported.isEmpty() || genericMetadata || isExecutableName(reported) ||
+        reported.equals(executableName, ignoreCase = true)
+    ) {
         return friendlyExecutableName(executableName)
     }
     return reported

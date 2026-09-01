@@ -13,6 +13,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
@@ -89,6 +90,7 @@ import dev.lapse.app.AppState
 import dev.lapse.domain.OverlayMode
 import dev.lapse.domain.SessionTask
 import dev.lapse.theme.LapseColors
+import dev.lapse.ui.TabularFigures
 import dev.lapse.ui.activityStatusLabel
 import dev.lapse.ui.activitySubtitle
 import dev.lapse.ui.formatTimer
@@ -166,6 +168,12 @@ private fun CollapsedOverlay(state: AppState, onIntent: (AppIntent) -> Unit, dra
             color = LapseColors.text,
             fontSize = 17.sp,
             fontWeight = FontWeight.SemiBold,
+            style = TextStyle(
+                color = LapseColors.text,
+                fontSize = 17.sp,
+                fontWeight = FontWeight.SemiBold,
+                fontFeatureSettings = TabularFigures,
+            ),
         )
         Icon(Icons.Rounded.Check, null, Modifier.size(14.dp), tint = LapseColors.textMuted)
         Spacer(Modifier.width(4.dp))
@@ -209,6 +217,12 @@ private fun ExpandedOverlay(state: AppState, onIntent: (AppIntent) -> Unit, drag
             color = LapseColors.text,
             fontSize = 34.sp,
             fontWeight = FontWeight.Light,
+            style = TextStyle(
+                color = LapseColors.text,
+                fontSize = 34.sp,
+                fontWeight = FontWeight.Light,
+                fontFeatureSettings = TabularFigures,
+            ),
         )
         Text(
             activitySubtitle(state.activityState),
@@ -440,7 +454,14 @@ private fun TaskRow(
         Spacer(Modifier.width(8.dp))
         Text(
             task.title,
-            modifier = Modifier.weight(1f).clickable(onClick = onEdit),
+            modifier = Modifier
+                .weight(1f)
+                .combinedClickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() },
+                    onDoubleClick = onEdit,
+                    onClick = {},
+                ),
             color = titleColor,
             fontSize = 12.sp,
             maxLines = 1,

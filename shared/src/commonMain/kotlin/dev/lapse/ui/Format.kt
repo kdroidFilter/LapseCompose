@@ -3,7 +3,6 @@ package dev.lapse.ui
 import androidx.compose.runtime.Composable
 import dev.lapse.domain.UserActivityState
 import kotlinx.datetime.DatePeriod
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.number
@@ -24,15 +23,24 @@ import lapse.shared.generated.resources.status_paused
 import lapse.shared.generated.resources.status_sleeping
 import lapse.shared.generated.resources.today
 import lapse.shared.generated.resources.weekday_fri
+import lapse.shared.generated.resources.weekday_friday
 import lapse.shared.generated.resources.weekday_mon
+import lapse.shared.generated.resources.weekday_monday
 import lapse.shared.generated.resources.weekday_sat
+import lapse.shared.generated.resources.weekday_saturday
 import lapse.shared.generated.resources.weekday_sun
+import lapse.shared.generated.resources.weekday_sunday
 import lapse.shared.generated.resources.weekday_thu
+import lapse.shared.generated.resources.weekday_thursday
 import lapse.shared.generated.resources.weekday_tue
+import lapse.shared.generated.resources.weekday_tuesday
 import lapse.shared.generated.resources.weekday_wed
+import lapse.shared.generated.resources.weekday_wednesday
 import lapse.shared.generated.resources.yesterday
 import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Instant
+
+const val TabularFigures = "tnum"
 
 fun formatTimer(durationMs: Long): String {
     val totalSeconds = (durationMs / 1000).coerceAtLeast(0)
@@ -112,4 +120,18 @@ fun weekdayShort(isoDayOfWeek: Int): String {
         Res.string.weekday_sun,
     )
     return stringResource(res.getOrElse(isoDayOfWeek - 1) { Res.string.weekday_mon })
+}
+
+@Composable
+fun weekdayLong(isoDayOfWeek: Int): String {
+    val res = listOf(
+        Res.string.weekday_monday,
+        Res.string.weekday_tuesday,
+        Res.string.weekday_wednesday,
+        Res.string.weekday_thursday,
+        Res.string.weekday_friday,
+        Res.string.weekday_saturday,
+        Res.string.weekday_sunday,
+    )
+    return stringResource(res.getOrElse(isoDayOfWeek - 1) { Res.string.weekday_monday })
 }

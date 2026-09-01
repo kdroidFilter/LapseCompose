@@ -16,6 +16,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -48,12 +49,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.lapse.app.AppIntent
@@ -64,12 +69,15 @@ import dev.lapse.domain.DashboardPage
 import dev.lapse.domain.UsageAnalytics
 import dev.lapse.domain.currentTimeMs
 import dev.lapse.theme.LapseColors
+import dev.lapse.ui.TabularFigures
 import dev.lapse.ui.formatClock
 import dev.lapse.ui.formatDurationShort
 import dev.lapse.ui.sessionDateLabel
-import dev.lapse.ui.weekdayShort
 import lapse.shared.generated.resources.Res
 import lapse.shared.generated.resources.apps_empty
+import lapse.shared.generated.resources.apps_header_application
+import lapse.shared.generated.resources.apps_header_share
+import lapse.shared.generated.resources.apps_header_time
 import lapse.shared.generated.resources.apps_tracked_seven_days
 import lapse.shared.generated.resources.apps_tracked_today
 import lapse.shared.generated.resources.metric_active_time
@@ -236,11 +244,23 @@ private fun OverviewPage(sessions: List<ComputerSession>, nowMs: Long) {
     PageShell(stringResource(Res.string.nav_dashboard), stringResource(Res.string.page_dashboard_subtitle)) {
         Column {
             Panel(Modifier.fillMaxWidth()) {
-                Row(Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
-                    Metric(stringResource(Res.string.metric_today), formatDurationShort(summary.todayMs), Modifier.weight(1f), false)
-                    Metric(stringResource(Res.string.metric_seven_day_average), formatDurationShort(summary.sevenDayAverageMs), Modifier.weight(1f), true)
-                    Metric(stringResource(Res.string.metric_this_week), formatDurationShort(summary.thisWeekMs), Modifier.weight(1f), true)
-                    Metric(stringResource(Res.string.metric_sessions_today), "${summary.sessionsToday}", Modifier.weight(1f), true)
+                val metrics = listOf(
+                    stringResource(Res.string.metric_today) to formatDurationShort(summary.todayMs),
+                    stringResource(Res.string.metric_seven_day_average) to formatDurationShort(summary.sevenDayAverageMs),
+                    stringResource(Res.string.metric_this_week) to formatDurationShort(summary.thisWeekMs),
+                    stringResource(Res.string.metric_sessions_today) to "${summary.sessionsToday}",
+                )
+                BoxWithConstraints(Modifier.fillMaxWidth()) {
+                    val columns = if (maxWidth < 760.dp) 2 else 4
+                    Column(Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                        metrics.chunked(columns).forEach { row ->
+                            Row(Modifier.fillMaxWidth()) {
+                                row.forEachIndexed { index, (label, value) ->
+                                    Metric(label, value, Modifier.weight(1f), showLeftBorder = index != 0)
+                                }
+                            }
+                        }
+                    }
                 }
             }
             Spacer(Modifier.height(20.dp))
@@ -248,7 +268,7 @@ private fun OverviewPage(sessions: List<ComputerSession>, nowMs: Long) {
                 Column(Modifier.fillMaxSize().padding(20.dp, 18.dp, 20.dp, 16.dp)) {
                     Text(stringResource(Res.string.metric_active_time), color = LapseColors.text, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                     Spacer(Modifier.height(16.dp))
-                    UsageBars(summary.lastSevenDays, Modifier.fillMaxSize())
+                    UsageChart(summary.lastSevenDays, Modifier.fillMaxSize())
                 }
             }
         }
@@ -256,44 +276,36 @@ private fun OverviewPage(sessions: List<ComputerSession>, nowMs: Long) {
 }
 
 @Composable
-private fun Metric(label: String, value: String, modifier: Modifier, border: Boolean) {
+private fun Metric(label: String, value: String, modifier: Modifier, showLeftBorder: Boolean) {
     Column(
         modifier
-            .then(if (border) Modifier.border(width = 0.dp, color = LapseColors.border) else Modifier)
+            .drawBehind {
+                if (!showLeftBorder) return@drawBehind
+                val stroke = 1.dp.toPx()
+                drawLine(
+                    color = LapseColors.border,
+                    start = Offset(stroke / 2f, 0f),
+                    end = Offset(stroke / 2f, size.height),
+                    strokeWidth = stroke,
+                )
+            }
             .padding(horizontal = 18.dp, vertical = 15.dp),
         verticalArrangement = Arrangement.Center,
     ) {
         Text(label, color = LapseColors.textMuted, fontSize = 11.sp)
         Spacer(Modifier.height(8.dp))
-        Text(value, color = LapseColors.text, fontSize = 23.sp, fontWeight = FontWeight.SemiBold)
-    }
-}
-
-@Composable
-private fun UsageBars(points: List<dev.lapse.domain.DailyUsagePoint>, modifier: Modifier) {
-    val max = points.maxOfOrNull { it.durationMs }?.coerceAtLeast(60 * 60_000L) ?: 60 * 60_000L
-    Row(modifier, horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.Bottom) {
-        points.forEach { point ->
-            val ratio = (point.durationMs.toFloat() / max).coerceIn(0.02f, 1f)
-            Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(
-                    Modifier
-                        .width(22.dp)
-                        .weight(1f),
-                    contentAlignment = Alignment.BottomCenter,
-                ) {
-                    Box(
-                        Modifier
-                            .fillMaxWidth(0.52f)
-                            .fillMaxHeight(ratio)
-                            .clip(RoundedCornerShape(3.dp))
-                            .background(if (point.durationMs == 0L) LapseColors.border else LapseColors.accent),
-                    )
-                }
-                Spacer(Modifier.height(8.dp))
-                Text(weekdayShort(point.isoDayOfWeek), color = LapseColors.textMuted, fontSize = 10.sp)
-            }
-        }
+        Text(
+            value,
+            color = LapseColors.text,
+            fontSize = 23.sp,
+            fontWeight = FontWeight.SemiBold,
+            style = TextStyle(
+                color = LapseColors.text,
+                fontSize = 23.sp,
+                fontWeight = FontWeight.SemiBold,
+                fontFeatureSettings = TabularFigures,
+            ),
+        )
     }
 }
 
@@ -306,7 +318,18 @@ private fun ApplicationsPage(sessions: List<ComputerSession>, nowMs: Long) {
     PageShell(stringResource(Res.string.nav_applications), stringResource(Res.string.page_applications_subtitle)) {
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(formatDurationShort(total), color = LapseColors.text, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+                Text(
+                    formatDurationShort(total),
+                    color = LapseColors.text,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    style = TextStyle(
+                        color = LapseColors.text,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        fontFeatureSettings = TabularFigures,
+                    ),
+                )
                 Spacer(Modifier.width(8.dp))
                 Text(
                     stringResource(if (days == 1) Res.string.apps_tracked_today else Res.string.apps_tracked_seven_days),
@@ -319,9 +342,13 @@ private fun ApplicationsPage(sessions: List<ComputerSession>, nowMs: Long) {
             Spacer(Modifier.height(20.dp))
             Panel(Modifier.fillMaxSize()) {
                 if (usages.isEmpty()) {
-                    Empty(stringResource(Res.string.apps_empty))
+                    Empty(stringResource(Res.string.apps_empty), Icons.Outlined.Apps)
                 } else {
                     LazyColumn {
+                        item {
+                            ApplicationListHeader()
+                            HorizontalDivider(color = LapseColors.border)
+                        }
                         itemsIndexed(usages) { index, usage ->
                             ApplicationRow(index + 1, usage, total)
                             HorizontalDivider(color = LapseColors.border, modifier = Modifier.padding(start = 64.dp))
@@ -393,8 +420,23 @@ private fun ApplicationRow(rank: Int, usage: ApplicationUsage, total: Long) {
             )
         }
         Spacer(Modifier.width(20.dp))
-        Text(formatDurationShort(usage.activeDurationMs), color = LapseColors.text, fontSize = 12.sp, modifier = Modifier.width(76.dp), maxLines = 1)
-        Text(stringResource(Res.string.percent, (ratio * 100).toInt()), color = LapseColors.textMuted, fontSize = 12.sp, modifier = Modifier.width(54.dp), maxLines = 1)
+        Text(
+            formatDurationShort(usage.activeDurationMs),
+            color = LapseColors.text,
+            fontSize = 12.sp,
+            modifier = Modifier.width(76.dp),
+            maxLines = 1,
+            textAlign = TextAlign.End,
+            style = TextStyle(fontFeatureSettings = TabularFigures, fontSize = 12.sp, color = LapseColors.text),
+        )
+        Text(
+            stringResource(Res.string.percent, (ratio * 100).toInt()),
+            color = LapseColors.textMuted,
+            fontSize = 12.sp,
+            modifier = Modifier.width(54.dp),
+            maxLines = 1,
+            textAlign = TextAlign.End,
+        )
     }
 }
 
@@ -402,7 +444,7 @@ private fun ApplicationRow(rank: Int, usage: ApplicationUsage, total: Long) {
 private fun SessionsPage(sessions: List<ComputerSession>, nowMs: Long) {
     PageShell(stringResource(Res.string.nav_sessions), stringResource(Res.string.page_sessions_subtitle)) {
         if (sessions.isEmpty()) {
-            Empty(stringResource(Res.string.sessions_empty))
+            Empty(stringResource(Res.string.sessions_empty), Icons.Rounded.History)
         } else {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 itemsIndexed(sessions) { _, session ->
@@ -422,7 +464,12 @@ private fun SessionsPage(sessions: List<ComputerSession>, nowMs: Long) {
                                     fontSize = 11.sp,
                                 )
                             }
-                            Text(stringResource(Res.string.session_active, formatDurationShort(session.activeDurationMs)), color = LapseColors.text, fontSize = 12.sp)
+                            Text(
+                                stringResource(Res.string.session_active, formatDurationShort(session.activeDurationMs)),
+                                color = LapseColors.text,
+                                fontSize = 12.sp,
+                                style = TextStyle(fontFeatureSettings = TabularFigures, fontSize = 12.sp, color = LapseColors.text),
+                            )
                             Spacer(Modifier.width(30.dp))
                             Text(stringResource(Res.string.session_tasks, completed, session.tasks.size), color = LapseColors.textMuted, fontSize = 11.sp)
                         }
@@ -479,8 +526,50 @@ private fun SettingRow(title: String, subtitle: String, value: Boolean, onChange
 }
 
 @Composable
-private fun Empty(message: String) {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+private fun ApplicationListHeader() {
+    Row(
+        Modifier.fillMaxWidth().padding(20.dp, 12.dp, 20.dp, 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Spacer(Modifier.width(44.dp))
+        Text(
+            stringResource(Res.string.apps_header_application),
+            modifier = Modifier.weight(1f),
+            color = LapseColors.textMuted,
+            fontSize = 9.sp,
+            fontWeight = FontWeight.SemiBold,
+            letterSpacing = 0.8.sp,
+        )
+        Text(
+            stringResource(Res.string.apps_header_time),
+            modifier = Modifier.width(76.dp),
+            color = LapseColors.textMuted,
+            fontSize = 9.sp,
+            fontWeight = FontWeight.SemiBold,
+            letterSpacing = 0.8.sp,
+            textAlign = TextAlign.End,
+        )
+        Text(
+            stringResource(Res.string.apps_header_share),
+            modifier = Modifier.width(54.dp),
+            color = LapseColors.textMuted,
+            fontSize = 9.sp,
+            fontWeight = FontWeight.SemiBold,
+            letterSpacing = 0.8.sp,
+            textAlign = TextAlign.End,
+        )
+    }
+}
+
+@Composable
+private fun Empty(message: String, icon: ImageVector) {
+    Column(
+        Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Icon(icon, contentDescription = null, modifier = Modifier.size(28.dp), tint = LapseColors.textMuted)
+        Spacer(Modifier.height(10.dp))
         Text(message, color = LapseColors.textMuted, fontSize = 12.sp)
     }
 }

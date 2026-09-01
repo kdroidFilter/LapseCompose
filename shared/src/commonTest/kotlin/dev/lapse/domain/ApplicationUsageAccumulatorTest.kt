@@ -85,6 +85,17 @@ class ApplicationUsageAccumulatorTest {
     }
 
     @Test
+    fun friendlyNameWhenReportedEqualsExecutable() {
+        assertEquals(
+            "google chrome",
+            applicationDisplayName(
+                executableName = "google-chrome",
+                reportedDisplayName = "google-chrome",
+            ),
+        )
+    }
+
+    @Test
     fun keepsReliableProductNames() {
         assertEquals(
             "Visual Studio Code",

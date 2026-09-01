@@ -5,11 +5,14 @@ interface MonotonicClock {
 }
 
 class StopwatchClock : MonotonicClock {
-    private val started = currentTimeMs()
-    override val elapsedMs: Long get() = currentTimeMs() - started
+    private val started = monotonicTimeMs()
+    override val elapsedMs: Long get() = monotonicTimeMs() - started
 }
 
 expect fun currentTimeMs(): Long
+
+/** Monotonic elapsed time; immune to wall-clock / NTP jumps. */
+expect fun monotonicTimeMs(): Long
 
 class MutableClock(var valueMs: Long = 0) : MonotonicClock {
     fun advance(deltaMs: Long) {

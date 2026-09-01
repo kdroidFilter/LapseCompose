@@ -5,6 +5,12 @@
 //   ./gradlew :shared:stabilityDump
 
 @Composable
+private fun dev.lapse.dashboard.ApplicationListHeader(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
 private fun dev.lapse.dashboard.ApplicationRow(rank: kotlin.Int, usage: dev.lapse.domain.ApplicationUsage, total: kotlin.Long): kotlin.Unit
   skippable: true
   restartable: true
@@ -22,6 +28,16 @@ private fun dev.lapse.dashboard.ApplicationsPage(sessions: kotlin.collections.Li
     - nowMs: STABLE (primitive type)
 
 @Composable
+private fun dev.lapse.dashboard.ChartTooltip(point: dev.lapse.domain.DailyUsagePoint, pointer: androidx.compose.ui.geometry.Offset, boxSize: androidx.compose.ui.unit.IntSize, sevenDayTotal: kotlin.Long): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - point: STABLE (marked @Stable or @Immutable)
+    - pointer: STABLE (marked @Stable or @Immutable)
+    - boxSize: STABLE (marked @Stable or @Immutable)
+    - sevenDayTotal: STABLE (primitive type)
+
+@Composable
 public fun dev.lapse.dashboard.DashboardScreen(state: dev.lapse.app.AppState, onIntent: kotlin.Function1<dev.lapse.app.AppIntent, kotlin.Unit>, modifier: androidx.compose.ui.Modifier, contentPadding: androidx.compose.foundation.layout.PaddingValues): kotlin.Unit
   skippable: true
   restartable: true
@@ -32,21 +48,22 @@ public fun dev.lapse.dashboard.DashboardScreen(state: dev.lapse.app.AppState, on
     - contentPadding: STABLE (marked @Stable or @Immutable)
 
 @Composable
-private fun dev.lapse.dashboard.Empty(message: kotlin.String): kotlin.Unit
+private fun dev.lapse.dashboard.Empty(message: kotlin.String, icon: androidx.compose.ui.graphics.vector.ImageVector): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - message: STABLE (String is immutable)
+    - icon: STABLE (marked @Stable or @Immutable)
 
 @Composable
-private fun dev.lapse.dashboard.Metric(label: kotlin.String, value: kotlin.String, modifier: androidx.compose.ui.Modifier, border: kotlin.Boolean): kotlin.Unit
+private fun dev.lapse.dashboard.Metric(label: kotlin.String, value: kotlin.String, modifier: androidx.compose.ui.Modifier, showLeftBorder: kotlin.Boolean): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - label: STABLE (String is immutable)
     - value: STABLE (String is immutable)
     - modifier: STABLE (marked @Stable or @Immutable)
-    - border: STABLE (primitive type)
+    - showLeftBorder: STABLE (primitive type)
 
 @Composable
 private fun dev.lapse.dashboard.NavItem(icon: androidx.compose.ui.graphics.vector.ImageVector, label: kotlin.String, selected: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
@@ -136,7 +153,7 @@ private fun dev.lapse.dashboard.Sidebar(page: dev.lapse.domain.DashboardPage, on
     - contentPadding: STABLE (marked @Stable or @Immutable)
 
 @Composable
-private fun dev.lapse.dashboard.UsageBars(points: kotlin.collections.List<dev.lapse.domain.DailyUsagePoint>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+internal fun dev.lapse.dashboard.UsageChart(points: kotlin.collections.List<dev.lapse.domain.DailyUsagePoint>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -196,13 +213,15 @@ private fun dev.lapse.overlay.StatusDot(state: dev.lapse.domain.UserActivityStat
     - state: STABLE (class with no mutable properties)
 
 @Composable
-private fun dev.lapse.overlay.TaskEditor(value: kotlin.String, onValueChange: kotlin.Function1<kotlin.String, kotlin.Unit>, hint: kotlin.String, onSubmit: kotlin.Function0<kotlin.Unit>, onCancel: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+private fun dev.lapse.overlay.TaskEditor(value: kotlin.String, onValueChange: kotlin.Function1<kotlin.String, kotlin.Unit>, hint: kotlin.String, confirmLabel: kotlin.String, isAdding: kotlin.Boolean, onSubmit: kotlin.Function0<kotlin.Unit>, onCancel: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - value: STABLE (String is immutable)
     - onValueChange: STABLE (function type)
     - hint: STABLE (String is immutable)
+    - confirmLabel: STABLE (String is immutable)
+    - isAdding: STABLE (primitive type)
     - onSubmit: STABLE (function type)
     - onCancel: STABLE (function type)
 
@@ -257,6 +276,13 @@ public fun dev.lapse.ui.sessionDateLabel(epochMs: kotlin.Long, nowMs: kotlin.Lon
   params:
     - epochMs: STABLE (primitive type)
     - nowMs: STABLE (primitive type)
+
+@Composable
+public fun dev.lapse.ui.weekdayLong(isoDayOfWeek: kotlin.Int): kotlin.String
+  skippable: false
+  restartable: false
+  params:
+    - isoDayOfWeek: STABLE (primitive type)
 
 @Composable
 public fun dev.lapse.ui.weekdayShort(isoDayOfWeek: kotlin.Int): kotlin.String

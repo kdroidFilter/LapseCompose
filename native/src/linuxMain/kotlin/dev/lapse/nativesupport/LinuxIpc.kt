@@ -45,7 +45,8 @@ internal object LinuxIpc {
         val reply = candidates.firstNotNullOfOrNull { unixCall(it, "activewindow") } ?: return null
         val pid = field(reply, "pid")?.toIntOrNull() ?: return null
         val title = field(reply, "title").orEmpty()
-        return processFromPid(pid, title)
+        val wmClass = field(reply, "class").orEmpty()
+        return processFromPid(pid, title, wmClass)
     }
 
     private fun swayForeground(): ForegroundApp? {
@@ -60,7 +61,10 @@ internal object LinuxIpc {
             ?.get(1)
             ?.unescapeJson()
             .orEmpty()
-        return processFromPid(pid, title)
+        val wmClass = jsonString(focused, "app_id")
+            ?: jsonString(focused, "class")
+            ?: ""
+        return processFromPid(pid, title, wmClass)
     }
 
     private fun focusedChunk(json: String): String? {
@@ -71,9 +75,18 @@ internal object LinuxIpc {
     }
 
     private fun field(text: String, key: String): String? {
-        val line = text.lineSequence().firstOrNull { it.startsWith("$key:") } ?: return null
+        val prefix = "$key:"
+        val line = text.lineSequence().firstOrNull { it.startsWith(prefix) } ?: return null
         return line.substringAfter(':').trim().ifEmpty { null }
     }
+
+    private fun jsonString(json: String, key: String): String? =
+        Regex("\"$key\"\\s*:\\s*\"((?:\\\\.|[^\"])*)\"")
+            .find(json)
+            ?.groupValues
+            ?.get(1)
+            ?.unescapeJson()
+            ?.takeIf { it.isNotEmpty() }
 
     private fun i3Tree(path: String): String? {
         val fd = unixConnect(path) ?: return null

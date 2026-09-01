@@ -1,16 +1,9 @@
-@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
-
 package dev.lapse.nativesupport
 
-import kotlinx.cinterop.alloc
-import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.ptr
-import platform.posix.clock_gettime
-import platform.posix.timespec
-
 actual class NativeHost actual constructor() {
-    private var lastTickMs: Long = monotonicMs()
-    private var lastWallMs: Long = wallMs()
+    private var lastTickMs: Long = linuxClockMs(CLOCK_MONOTONIC)
+    private var lastWallMs: Long = linuxClockMs(CLOCK_REALTIME)
+    private var lastSleepDebtMs: Long = sleepDebtMs()
     private var sleeping: Boolean = false
 
     actual fun activitySnapshot(): ActivitySnapshot {
@@ -25,23 +18,25 @@ actual class NativeHost actual constructor() {
         LinuxIpc.foregroundApplication() ?: LinuxX11.foregroundApplication()
 
     private fun refreshSleep() {
-        val tick = monotonicMs()
-        val wall = wallMs()
+        val debt = sleepDebtMs()
+        if (debt >= 0L && lastSleepDebtMs >= 0L) {
+            sleeping = debt - lastSleepDebtMs > 15_000L
+            lastSleepDebtMs = debt
+            lastTickMs = linuxClockMs(CLOCK_MONOTONIC)
+            lastWallMs = linuxClockMs(CLOCK_REALTIME)
+            return
+        }
+        val tick = linuxClockMs(CLOCK_MONOTONIC)
+        val wall = linuxClockMs(CLOCK_REALTIME)
         sleeping = wall - lastWallMs - (tick - lastTickMs) > 15_000L
         lastTickMs = tick
         lastWallMs = wall
     }
 }
 
-private const val CLOCK_REALTIME = 0
-private const val CLOCK_MONOTONIC = 1
-
-private fun monotonicMs(): Long = clockMs(CLOCK_MONOTONIC)
-
-private fun wallMs(): Long = clockMs(CLOCK_REALTIME)
-
-private fun clockMs(clockId: Int): Long = memScoped {
-    val ts = alloc<timespec>()
-    if (clock_gettime(clockId, ts.ptr) != 0) return 0L
-    ts.tv_sec * 1000L + ts.tv_nsec / 1_000_000L
+/** CLOCK_BOOTTIME includes suspend; CLOCK_MONOTONIC does not. Their gap is time spent asleep. */
+private fun sleepDebtMs(): Long {
+    val boot = linuxClockMs(CLOCK_BOOTTIME)
+    if (boot <= 0L) return -1L
+    return (boot - linuxClockMs(CLOCK_MONOTONIC)).coerceAtLeast(0L)
 }

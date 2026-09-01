@@ -36,7 +36,7 @@
     <string name="activity_active">Active session</string>
     <string name="activity_paused">Tracking paused</string>
     <string name="activity_idle">Paused while idle</string>
-    <string name="activity_locked">Paused while Windows is locked</string>
+    <string name="activity_locked">Paused while the screen is locked</string>
     <string name="activity_sleeping">Paused while the PC sleeps</string>
 
     <string name="nav_workspace">WORKSPACE</string>
@@ -48,7 +48,7 @@
     <string name="page_dashboard_subtitle">Your active computer time at a glance.</string>
     <string name="page_applications_subtitle">Foreground application usage while Lapse was active.</string>
     <string name="page_sessions_subtitle">Recent computer sessions stored on this device.</string>
-    <string name="page_settings_subtitle">Control how Lapse behaves on Windows.</string>
+    <string name="page_settings_subtitle">Control how Lapse behaves on this computer.</string>
 
     <string name="metric_today">Today</string>
     <string name="metric_seven_day_average">7-day average</string>
@@ -83,10 +83,22 @@
     <string name="weekday_fri">Fri</string>
     <string name="weekday_sat">Sat</string>
     <string name="weekday_sun">Sun</string>
+    <string name="weekday_monday">Monday</string>
+    <string name="weekday_tuesday">Tuesday</string>
+    <string name="weekday_wednesday">Wednesday</string>
+    <string name="weekday_thursday">Thursday</string>
+    <string name="weekday_friday">Friday</string>
+    <string name="weekday_saturday">Saturday</string>
+    <string name="weekday_sunday">Sunday</string>
+    <string name="chart_date">%1$s, %2$s.%3$s.%4$d</string>
+    <string name="chart_share_caption">active · 7-day share</string>
+    <string name="apps_header_application">APPLICATION</string>
+    <string name="apps_header_time">TIME</string>
+    <string name="apps_header_share">SHARE</string>
 
     <string name="duration_seconds">%1$ds</string>
     <string name="duration_minutes">%1$dm</string>
     <string name="duration_hours_minutes">%1$dh %2$s</string>
 
-    <string name="error_native_unavailable">Some Windows features are unavailable.</string>
+    <string name="error_native_unavailable">Some system features are unavailable.</string>
 </resources>

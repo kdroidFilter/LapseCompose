@@ -1,6 +1,7 @@
 package dev.lapse.nativesupport
 
 import kotlin.test.Test
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class NativeHostTest {
@@ -8,6 +9,14 @@ class NativeHostTest {
     fun activitySnapshotIsSane() {
         NativeHost().use { host ->
             host.activitySnapshot()
+        }
+    }
+
+    @Test
+    fun activitySnapshotIsNotSleepingWhileAwake() {
+        NativeHost().use { host ->
+            host.activitySnapshot()
+            assertFalse(host.activitySnapshot().sleeping)
         }
     }
 

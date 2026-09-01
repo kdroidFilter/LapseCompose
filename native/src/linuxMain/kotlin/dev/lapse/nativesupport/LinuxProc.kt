@@ -61,7 +61,11 @@ internal fun exePath(pid: Int): String? = memScoped {
     buf.toKString()
 }
 
-internal fun processFromPid(pid: Int, windowTitle: String): ForegroundApp? {
+internal fun processFromPid(
+    pid: Int,
+    windowTitle: String,
+    wmClass: String = "",
+): ForegroundApp? {
     if (pid <= 0) return null
     val path = exePath(pid).orEmpty()
     val comm = readFile("/proc/$pid/comm").orEmpty()
@@ -70,11 +74,12 @@ internal fun processFromPid(pid: Int, windowTitle: String): ForegroundApp? {
         comm.isNotEmpty() -> comm
         else -> return null
     }
+    val desktopName = LinuxDesktop.displayName(path, executableName, wmClass)
     return ForegroundApp(
         processId = pid,
         executablePath = path,
         executableName = executableName,
-        displayName = comm.ifEmpty { executableName },
+        displayName = desktopName.ifEmpty { comm.ifEmpty { executableName } },
         windowTitle = windowTitle,
     )
 }
