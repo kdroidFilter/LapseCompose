@@ -81,6 +81,7 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -201,7 +202,15 @@ private fun ExpandedOverlay(state: AppState, onIntent: (AppIntent) -> Unit, drag
     var draft by remember { mutableStateOf("") }
     val total = state.session.tasks.size
     val completed = state.completedTaskCount
-    Column(Modifier.fillMaxSize().padding(14.dp, 11.dp, 14.dp, 10.dp)) {
+    val focusManager = LocalFocusManager.current
+    Column(
+        Modifier
+            .fillMaxSize()
+            // ponytail: a click anywhere else just drops focus, TaskEditor decides
+            // from there whether an empty draft cancels the add.
+            .clickable(remember { MutableInteractionSource() }, null) { focusManager.clearFocus() }
+            .padding(14.dp, 11.dp, 14.dp, 10.dp),
+    ) {
         Row(Modifier.fillMaxWidth().height(28.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(Res.string.app_name), color = LapseColors.text, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.width(10.dp))
@@ -364,6 +373,7 @@ private fun TaskEditor(
     Row(
         Modifier
             .fillMaxWidth()
+            .height(34.dp)
             .padding(vertical = 2.dp)
             .clip(RoundedCornerShape(8.dp))
             .background(LapseColors.surfaceRaised)
@@ -405,7 +415,7 @@ private fun TaskEditor(
             decorationBox = { inner ->
                 Box {
                     if (value.isEmpty()) {
-                        Text(hint, color = LapseColors.textMuted, fontSize = 12.sp)
+                        Text(hint, color = LapseColors.textMuted, fontSize = 13.sp)
                     }
                     inner()
                 }
